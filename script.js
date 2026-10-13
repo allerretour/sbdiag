@@ -27,7 +27,7 @@ for (let m = 1; m <= 10; m++) {
             </label>
         </div>
         <div class="input-cell">
-            <label id="bonus-container-${m}" class="cb-touch-label cb-za" title="Blanche dans la ZA (+5 pts)">
+            <label id="bonus-container-${m}" class="cb-touch-label cb-za" title="Blanche dans la ZA (+5 pts)" style="visibility: hidden;">
                 <input type="checkbox" id="za-${m}" onchange="calculerScore()">
             </label>
         </div>
@@ -56,30 +56,33 @@ function calculerScore() {
         const checkboxZa = document.getElementById(`za-${m}`);
         const bonusContainer = document.getElementById(`bonus-container-${m}`);
         const scoreMancheSpan = document.getElementById(`score-m-${m}`);
+        const mancheCard = scoreMancheSpan.closest('.manche-card'); 
 
         let billes = scoresState[m];
         let scoreManche = 0;
 
-        // Si faute (blanche empochée) : la manche retombe à 0
+        mancheCard.classList.remove('manche-foul', 'manche-parfaite', 'manche-encours');
+
         if (checkboxBlanche.checked) {
             scoreManche = 0;
             bonusContainer.style.visibility = 'hidden';
             checkboxZa.checked = false;
+            mancheCard.classList.add('manche-foul');
         } else {
             scoreManche = billes;
 
-            // Règle de la manche parfaite (doublé)
             if (billes === m) {
                 scoreManche = scoreManche * 2;
                 bonusContainer.style.visibility = 'visible';
                 
-                // Bonus Zone d'Arrivée
                 if (checkboxZa.checked) {
                     scoreManche += 5;
+                    mancheCard.classList.add('manche-parfaite');
+                } else if (scoreManche > 0) {
+                    mancheCard.classList.add('manche-encours');
                 }
-            } else {
-                bonusContainer.style.visibility = 'hidden';
-                checkboxZa.checked = false;
+            } else if (scoreManche > 0) {
+                mancheCard.classList.add('manche-encours');
             }
         }
 
@@ -87,20 +90,35 @@ function calculerScore() {
         scoreTotal += scoreManche;
     }
 
-    // Affichage des points bruts
     totalSpan.innerText = scoreTotal;
 
-    // Mise à jour de l'indicateur textuel de pourcentage (+ ou -)
     let pourcentage = parseInt(ajustementSlider.value) || 0;
-    ajustementTxt.innerText = pourcentage > 0 ? `+${pourcentage}` : pourcentage;
+    ajustementTxt.innerText = pourcentage > 0 ? `+${pourcentage}%` : `${pourcentage}%`;
 
-    // Calcul final arrondi avec le pourcentage d'ajustement
+    // --- DYNAMISATION DE LA COULEUR DU SLIDER ---
+    if (pourcentage > 0) {
+        ajustementSlider.style.background = 'var(--accent-green)';
+        ajustementTxt.style.color = 'var(--accent-green)';
+        ajustementTxt.style.background = 'rgba(16, 185, 129, 0.15)';
+    } else if (pourcentage < 0) {
+        ajustementSlider.style.background = 'var(--accent-red)';
+        ajustementTxt.style.color = 'var(--accent-red)';
+        ajustementTxt.style.background = 'rgba(239, 68, 68, 0.15)';
+    } else {
+        ajustementSlider.style.background = '#334155'; // Gris neutre par défaut
+        ajustementTxt.style.color = 'var(--accent-blue)';
+        ajustementTxt.style.background = 'rgba(59, 130, 246, 0.15)';
+    }
+
     let multiplicateur = 1 + (pourcentage / 100);
     let scoreFinal = Math.round(scoreTotal * multiplicateur);
 
     if (scoreFinal < 0) scoreFinal = 0;
     finalScoreSpan.innerText = scoreFinal;
 }
+
+
+
 
 // Réinitialisation complète de la grille de jeu
 function reinitialiserPartie() {
