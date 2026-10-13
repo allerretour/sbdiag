@@ -6,7 +6,7 @@ const ajustementTxt = document.getElementById('ajustement-txt');
 
 const scoresState = {};
 
-// Génération dynamique des 10 manches tactiles dans le HTML
+// GÃ©nÃ©ration dynamique des 10 manches tactiles dans le HTML
 for (let m = 1; m <= 10; m++) {
     scoresState[m] = 0;
     
@@ -22,7 +22,7 @@ for (let m = 1; m <= 10; m++) {
             <button class="btn-touch" onclick="modifierBilles(${m}, 1)">+</button>
         </div>
         <div class="input-cell">
-            <label class="cb-touch-label cb-foul" title="Blanche empochée (0 pt)">
+            <label class="cb-touch-label cb-foul" title="Blanche empochÃ©e (0 pt)">
                 <input type="checkbox" id="blanche-${m}" onchange="calculerScore()">
             </label>
         </div>
@@ -36,7 +36,7 @@ for (let m = 1; m <= 10; m++) {
     manchesList.appendChild(div);
 }
 
-// Gestion de l'incrémentation/décrémentation des billes empochées
+// Gestion de l'incrÃ©mentation/dÃ©crÃ©mentation des billes empochÃ©es
 function modifierBilles(manche, changement) {
     let nvValeur = scoresState[manche] + changement;
     
@@ -105,7 +105,7 @@ function calculerScore() {
         ajustementTxt.style.color = 'var(--accent-red)';
         ajustementTxt.style.background = 'rgba(239, 68, 68, 0.15)';
     } else {
-        ajustementSlider.style.background = '#334155'; // Gris neutre par défaut
+        ajustementSlider.style.background = '#334155'; // Gris neutre par dÃ©faut
         ajustementTxt.style.color = 'var(--accent-blue)';
         ajustementTxt.style.background = 'rgba(59, 130, 246, 0.15)';
     }
@@ -120,9 +120,9 @@ function calculerScore() {
 
 
 
-// Réinitialisation complète de la grille de jeu
+// RÃ©initialisation complÃ¨te de la grille de jeu
 function reinitialiserPartie() {
-    if (confirm("Voulez-vous vraiment remettre tous les scores et l'ajustement à zéro ?")) {
+    if (confirm("Voulez-vous vraiment remettre tous les scores et l'ajustement Ã  zÃ©ro ?")) {
         ajustementSlider.value = 0;
         for (let m = 1; m <= 10; m++) {
             scoresState[m] = 0;
