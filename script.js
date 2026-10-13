@@ -10,76 +10,90 @@ const gameEngine = {
     domCache: {}
 };
 
-// Génération dynamique des 10 manches
-for (let m = 1; m <= 10; m++) {
-    gameEngine.scoresState[m] = 0;
-    
-    const div = document.createElement('div');
-    div.className = 'manche-card';
-    
-    // Structure HTML nettoyée des événements en ligne
-    div.innerHTML = `
-        <div class="manche-info">Manche #${m} <span>Bille: ${m}</span></div>
-        <div class="counter-group-wrapper">
-            <div class="billes-val main-trigger" id="val-billes-${m}">0</div>
-            <div class="mini-selecteur" id="selecteur-${m}" style="display: none;">
-                <div class="selecteur-grid" id="grid-${m}"></div>
-                <button class="btn-close-selecteur">Fermer</button>
+// Récupération du nouveau sélecteur de manches
+const selectManches = document.getElementById('select-manches');
+let nbManchesActuel = 10; // Par défaut
+
+// Fonction principale pour générer la grille des manches
+function initialiserGrille(nbManches) {
+    // On vide l'ancien contenu HTML et le cache
+    manchesList.innerHTML = '';
+    gameEngine.scoresState = {};
+    gameEngine.domCache = {};
+    nbManchesActuel = nbManches;
+
+    for (let m = 1; m <= nbManches; m++) {
+        gameEngine.scoresState[m] = 0;
+        
+        const div = document.createElement('div');
+        div.className = 'manche-card';
+        
+        div.innerHTML = `
+            <div class="manche-info">Manche #${m} <span>Bille: ${m}</span></div>
+            <div class="counter-group-wrapper">
+                <div class="billes-val main-trigger" id="val-billes-${m}">0</div>
+                <div class="mini-selecteur" id="selecteur-${m}" style="display: none;">
+                    <div class="selecteur-grid" id="grid-${m}"></div>
+                    <button class="btn-close-selecteur">Fermer</button>
+                </div>
+                <div class="counter-group controls-backup" id="controls-${m}" style="display: none;">
+                    <button class="btn-touch btn-moins">-</button>
+                    <button class="btn-touch btn-plus">+</button>
+                    <button class="btn-touch btn-max">M</button>
+                </div>
             </div>
-            <div class="counter-group controls-backup" id="controls-${m}" style="display: none;">
-                <button class="btn-touch btn-moins">-</button>
-                <button class="btn-touch btn-plus">+</button>
-                <button class="btn-touch btn-max">M</button>
+            <div class="input-cell">
+                <label class="cb-touch-label cb-foul" title="Blanche empochée (0 pt)">
+                    <input type="checkbox" id="blanche-${m}">
+                </label>
             </div>
-        </div>
-        <div class="input-cell">
-            <label class="cb-touch-label cb-foul" title="Blanche empochée (0 pt)">
-                <input type="checkbox" id="blanche-${m}">
-            </label>
-        </div>
-        <div class="input-cell">
-            <label id="bonus-container-${m}" class="cb-touch-label cb-za" title="Blanche dans la ZA (+5 pts)" style="visibility: hidden;">
-                <input type="checkbox" id="za-${m}">
-            </label>
-        </div>
-        <div class="score-manche"><span id="score-m-${m}">0</span></div>
-    `;
-    
-    manchesList.appendChild(div);
+            <div class="input-cell">
+                <label id="bonus-container-${m}" class="cb-touch-label cb-za" title="Blanche dans la ZA (+5 pts)" style="visibility: hidden;">
+                    <input type="checkbox" id="za-${m}">
+                </label>
+            </div>
+            <div class="score-manche"><span id="score-m-${m}">0</span></div>
+        `;
+        
+        manchesList.appendChild(div);
 
-    // Mise en cache immédiate des éléments du DOM fréquemment sollicités
-    gameEngine.domCache[m] = {
-        card: div,
-        valBilles: div.querySelector(`#val-billes-${m}`),
-        selecteur: div.querySelector(`#selecteur-${m}`),
-        grid: div.querySelector(`#grid-${m}`),
-        blanche: div.querySelector(`#blanche-${m}`),
-        za: div.querySelector(`#za-${m}`),
-        bonusContainer: div.querySelector(`#bonus-container-${m}`),
-        scoreMancheSpan: div.querySelector(`#score-m-${m}`),
-        btnMax: div.querySelector('.btn-max')
-    };
+        gameEngine.domCache[m] = {
+            card: div,
+            valBilles: div.querySelector(`#val-billes-${m}`),
+            selecteur: div.querySelector(`#selecteur-${m}`),
+            grid: div.querySelector(`#grid-${m}`),
+            blanche: div.querySelector(`#blanche-${m}`),
+            za: div.querySelector(`#za-${m}`),
+            bonusContainer: div.querySelector(`#bonus-container-${m}`),
+            scoreMancheSpan: div.querySelector(`#score-m-${m}`),
+            btnMax: div.querySelector('.btn-max')
+        };
 
-    // Attachement propre des écouteurs d'événements
-    const cache = gameEngine.domCache[m];
-    
-    cache.valBilles.addEventListener('click', () => toggleSelecteur(m));
-    div.querySelector('.btn-close-selecteur').addEventListener('click', () => toggleSelecteur(m));
-    
-    // Contrôles de secours (si activés dans votre CSS)
-    div.querySelector('.btn-moins').addEventListener('click', () => modifierBilles(m, -1));
-    div.querySelector('.btn-plus').addEventListener('click', () => modifierBilles(m, 1));
-    cache.btnMax.addEventListener('click', () => maximerBilles(m));
-    
-    // Checkboxes
-    cache.blanche.addEventListener('change', calculerScore);
-    cache.za.addEventListener('change', calculerScore);
+        const cache = gameEngine.domCache[m];
+        cache.valBilles.addEventListener('click', () => toggleSelecteur(m));
+        div.querySelector('.btn-close-selecteur').addEventListener('click', () => toggleSelecteur(m));
+        div.querySelector('.btn-moins').addEventListener('click', () => modifierBilles(m, -1));
+        div.querySelector('.btn-plus').addEventListener('click', () => modifierBilles(m, 1));
+        cache.btnMax.addEventListener('click', () => maximerBilles(m));
+        cache.blanche.addEventListener('change', calculerScore);
+        cache.za.addEventListener('change', calculerScore);
 
-    genererOptionsSelecteur(m);
+        genererOptionsSelecteur(m);
+    }
+    calculerScore();
 }
 
-// Écouteur sur le slider (Optionnel: ajoutez 'input' à la place de 'change' pour un calcul en temps réel lors du glissement)
+// Remplacer la boucle for (m=1..10) d'origine par cet écouteur et l'appel initial :
+selectManches.addEventListener('change', (e) => {
+    initialiserGrille(parseInt(e.target.value));
+});
+
+// Lancement initial de la grille avec 10 manches par défaut
+initialiserGrille(10);
+
+// Écouteur sur le slider
 ajustementSlider.addEventListener('change', calculerScore);
+
 
 function modifierBilles(manche, changement) {
     let nvValeur = gameEngine.scoresState[manche] + changement;
@@ -100,7 +114,8 @@ function maximerBilles(manche) {
 function calculerScore() {
     let scoreTotal = 0;
 
-        for (let m = 1; m <= 10; m++) {
+        // Remplacer le 10 par nbManchesActuel
+		for (let m = 1; m <= nbManchesActuel; m++) {
         const cache = gameEngine.domCache[m];
         let billes = gameEngine.scoresState[m];
         let scoreManche = 0;
@@ -223,7 +238,7 @@ function selectionnerValeur(manche, valeur) {
 function reinitialiserPartie() {
     if (confirm("Voulez-vous vraiment remettre tous les scores et l'ajustement à zéro ?")) {
         ajustementSlider.value = 0;
-        for (let m = 1; m <= 10; m++) {
+        for (let m = 1; m <= nbManchesActuel; m++) {
             gameEngine.scoresState[m] = 0;
             const cache = gameEngine.domCache[m];
             cache.valBilles.textContent = 0;
