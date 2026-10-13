@@ -91,28 +91,72 @@
             border-radius: 20px;
         }
 		
+/* --- Styles de base du Slider et du Texte d'ajustement --- */
 #ajustement-slider {
-    -webkit-appearance: none;  /* Supprime le style natif Chrome/Safari */
-    appearance: none;          /* Supprime le style natif standard */
+    -webkit-appearance: none; /* Force le rafraîchissement du style sur Chrome/Safari */
+    appearance: none;         /* Force le rafraîchissement du style général */
     width: 100%;
-    height: 8px;               /* Ajustez l'épaisseur de la barre */
-	background-color: #334155; /* <--- FORCE LE GRIS DÈS LE DÉPART */
+    height: 8px;              /* Épaisseur de la barre */
     border-radius: 4px;
     outline: none;
-    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
-/* Style du bouton rond pour pouvoir toujours le déplacer */
+/* Style du bouton du slider (le curseur rond) */
 #ajustement-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    background: #ffffff;
-    border: 2px solid #334155;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    background: var(--text-main);
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
+
+#ajustement-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--text-main);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+#ajustement-txt {
+    transition: color 0.2s ease, background-color 0.2s ease;
+    color: var(--local-accent);
+    background-color: var(--local-accent-bg);
+}
+
+/* --- États dynamiques gérés par les classes CSS --- */
+.slider-neutral {
+    --local-accent: var(--accent-blue, #3b82f6);
+    --local-accent-bg: rgba(59, 130, 246, 0.15);
+    --slider-color: #334155; /* Gris neutre lorsque le curseur est à 0% */
+}
+
+.slider-positive {
+    --local-accent: var(--accent-green, #10b981);
+    --local-accent-bg: rgba(16, 185, 129, 0.15);
+    --slider-color: var(--local-accent);
+}
+
+.slider-negative {
+    --local-accent: var(--accent-red, #ef4444);
+    --local-accent-bg: rgba(239, 68, 68, 0.15);
+    --slider-color: var(--local-accent);
+}
+
+/* Applique la couleur de fond dynamique sur la barre de contrôle */
+.slider-neutral #ajustement-slider,
+.slider-positive #ajustement-slider,
+.slider-negative #ajustement-slider {
+    background-color: var(--slider-color);
+}
+
+
 
 
 
@@ -261,28 +305,65 @@
             background: #334166;
         }
 		
-		/* Transition douce pour les changements de couleur de la ligne */
-        .manche-card {
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
+		/* --- TRANSITIONS GLOBALES DES CARTES --- */
+.manche-card {
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
 
-        /* Style si la ligne est FOUL (Accent rouge subtil) */
-        .manche-card.manche-foul {
-            background-color: rgba(239, 68, 68, 0.15) !important;
-            border-color: rgba(239, 68, 68, 0.4) !important;
-        }
+/* --- ETATS ET COULEURS DE FOND DES CARTES --- */
 
-        /* Style si la ligne est PARFAITE + ZA (Accent vert subtil) */
-        .manche-card.manche-parfaite {
-            background-color: rgba(16, 185, 129, 0.15) !important;
-            border-color: rgba(16, 185, 129, 0.4) !important;
-        }
+/* Style si la ligne est FOUL (Accent rouge subtil) */
+.manche-card.manche-foul {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+/* Style si la ligne est PARFAITE ou avec ZA (Accent vert subtil pour les deux) */
+.manche-card.manche-parfaite,
+.manche-card.manche-za {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Style si la ligne contient des points normaux (Accent jaune/orange subtil) */
+.manche-card.manche-encours {
+    background-color: rgba(245, 158, 11, 0.1) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+
+/* --- COULEURS DYNAMIQUES POUR LE TEXTE DU POINTAGE --- */
+
+/* Par défaut : Gris pâle pour le pointage à 0 (classe .manche-zero ou sans état) */
+.score-manche {
+    text-align: right;
+    font-size: 30px;
+    font-weight: 700;
+    color: #94a3b8; 
+    transition: color 0.3s ease;
+}
+
+/* Entre 0 et max (Ex: 3 billes sur la manche 5) : Blanc */
+.manche-encours .score-manche {
+    color: var(--text-main) !important; /* Blanc */
+}
+
+/* Quand Pointage Maximum atteint seul : Vert */
+.manche-parfaite .score-manche {
+    color: var(--accent-green) !important; /* Vert */
+}
+
+/* Quand ZA activé : Jaune / Or (La carte reste verte grâce au sélecteur groupé plus haut) */
+.manche-za .score-manche {
+    color: var(--accent-gold) !important; /* Jaune / Or */
+}
+
+/* Quand Faute (Blanche empochée) : Rouge */
+.manche-foul .score-manche {
+    color: var(--accent-red) !important; /* Rouge */
+}
+
 		
-		/* Style si la ligne contient des points normaux (Accent jaune subtil) */
-        .manche-card.manche-encours {
-            background-color: rgba(245, 158, 11, 0.1) !important;
-            border-color: rgba(245, 158, 11, 0.3) !important;
-        }
 		
 	/* Style du chiffre central transformé en bouton cliquable */
 /* Réduction de la largeur de la case/bouton du nombre de billes */
@@ -373,7 +454,7 @@
 }
 /* Style pour le chiffre actuellement sélectionné dans le sélecteur */
 .btn-select-val.is-active {
-    background-color: var(--accent-green, #10b981) !important;
+    background-color: var(--accent-blue, #3b82f6) !important;
     color: #ffffff;
     box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
     transform: scale(1.05);

@@ -4,242 +4,241 @@ const finalScoreSpan = document.getElementById('final-score');
 const ajustementSlider = document.getElementById('ajustement-slider');
 const ajustementTxt = document.getElementById('ajustement-txt');
 
-const scoresState = {};
+// Stockage centralisé des scores ET des références du DOM pour éviter les lookups répétitifs
+const gameEngine = {
+    scoresState: {},
+    domCache: {}
+};
 
-// Génération dynamique des 10 manches tactiles dans le HTML
+// Génération dynamique des 10 manches
 for (let m = 1; m <= 10; m++) {
-    scoresState[m] = 0;
+    gameEngine.scoresState[m] = 0;
     
     const div = document.createElement('div');
     div.className = 'manche-card';
+    
+    // Structure HTML nettoyée des événements en ligne
     div.innerHTML = `
-        <div class="manche-info">
-            Manche #${m} <span>Bille: ${m}</span>
-        </div>
+        <div class="manche-info">Manche #${m} <span>Bille: ${m}</span></div>
         <div class="counter-group-wrapper">
-            <!-- Le chiffre central qui sert maintenant de bouton principal -->
-            <div class="billes-val main-trigger" id="val-billes-${m}" onclick="toggleSelecteur(${m})">0</div>
-            
-            <!-- Mini-sélecteur contextuel masqué par défaut -->
+            <div class="billes-val main-trigger" id="val-billes-${m}">0</div>
             <div class="mini-selecteur" id="selecteur-${m}" style="display: none;">
                 <div class="selecteur-grid" id="grid-${m}"></div>
-                <button class="btn-close-selecteur" onclick="toggleSelecteur(${m})">Fermer</button>
+                <button class="btn-close-selecteur">Fermer</button>
             </div>
-
-            <!-- Anciens contrôles masqués par défaut (au cas où vous voulez les garder en secours) -->
             <div class="counter-group controls-backup" id="controls-${m}" style="display: none;">
-                <button class="btn-touch" onclick="modifierBilles(${m}, -1)">-</button>
-                <button class="btn-touch" onclick="modifierBilles(${m}, 1)">+</button>
-                <button class="btn-touch btn-max" onclick="maximerBilles(${m})">M</button>
+                <button class="btn-touch btn-moins">-</button>
+                <button class="btn-touch btn-plus">+</button>
+                <button class="btn-touch btn-max">M</button>
             </div>
         </div>
         <div class="input-cell">
             <label class="cb-touch-label cb-foul" title="Blanche empochée (0 pt)">
-                <input type="checkbox" id="blanche-${m}" onchange="calculerScore()">
+                <input type="checkbox" id="blanche-${m}">
             </label>
         </div>
         <div class="input-cell">
             <label id="bonus-container-${m}" class="cb-touch-label cb-za" title="Blanche dans la ZA (+5 pts)" style="visibility: hidden;">
-                <input type="checkbox" id="za-${m}" onchange="calculerScore()">
+                <input type="checkbox" id="za-${m}">
             </label>
         </div>
         <div class="score-manche"><span id="score-m-${m}">0</span></div>
     `;
-    manchesList.appendChild(div);
     
-    // Génère dynamiquement les boutons du sélecteur de 0 jusqu'au maximum de la manche (m)
+    manchesList.appendChild(div);
+
+    // Mise en cache immédiate des éléments du DOM fréquemment sollicités
+    gameEngine.domCache[m] = {
+        card: div,
+        valBilles: div.querySelector(`#val-billes-${m}`),
+        selecteur: div.querySelector(`#selecteur-${m}`),
+        grid: div.querySelector(`#grid-${m}`),
+        blanche: div.querySelector(`#blanche-${m}`),
+        za: div.querySelector(`#za-${m}`),
+        bonusContainer: div.querySelector(`#bonus-container-${m}`),
+        scoreMancheSpan: div.querySelector(`#score-m-${m}`),
+        btnMax: div.querySelector('.btn-max')
+    };
+
+    // Attachement propre des écouteurs d'événements
+    const cache = gameEngine.domCache[m];
+    
+    cache.valBilles.addEventListener('click', () => toggleSelecteur(m));
+    div.querySelector('.btn-close-selecteur').addEventListener('click', () => toggleSelecteur(m));
+    
+    // Contrôles de secours (si activés dans votre CSS)
+    div.querySelector('.btn-moins').addEventListener('click', () => modifierBilles(m, -1));
+    div.querySelector('.btn-plus').addEventListener('click', () => modifierBilles(m, 1));
+    cache.btnMax.addEventListener('click', () => maximerBilles(m));
+    
+    // Checkboxes
+    cache.blanche.addEventListener('change', calculerScore);
+    cache.za.addEventListener('change', calculerScore);
+
     genererOptionsSelecteur(m);
 }
 
+// Écouteur sur le slider (Optionnel: ajoutez 'input' à la place de 'change' pour un calcul en temps réel lors du glissement)
+ajustementSlider.addEventListener('change', calculerScore);
 
-
-// Gestion de l'incrémentation/décrémentation des billes empochées
 function modifierBilles(manche, changement) {
-    let nvValeur = scoresState[manche] + changement;
-    
+    let nvValeur = gameEngine.scoresState[manche] + changement;
     if (nvValeur >= 0 && nvValeur <= manche) {
-        scoresState[manche] = nvValeur;
-        document.getElementById(`val-billes-${manche}`).innerText = nvValeur;
+        gameEngine.scoresState[manche] = nvValeur;
+        gameEngine.domCache[manche].valBilles.textContent = nvValeur;
         calculerScore();
     }
 }
 
-// Fonction pour basculer le compteur entre le maximum et 0
 function maximerBilles(manche) {
-    // Si la manche est déjà au maximum, on remet à 0, sinon on met au maximum
-    if (scoresState[manche] === manche) {
-        scoresState[manche] = 0;
-    } else {
-        scoresState[manche] = manche;
-    }
-    
-    document.getElementById(`val-billes-${manche}`).innerText = scoresState[manche];
+    const actuel = gameEngine.scoresState[manche];
+    gameEngine.scoresState[manche] = (actuel === manche) ? 0 : manche;
+    gameEngine.domCache[manche].valBilles.textContent = gameEngine.scoresState[manche];
     calculerScore();
 }
 
-
-
-// Fonction globale pour calculer les points et appliquer l'ajustement
 function calculerScore() {
     let scoreTotal = 0;
 
-    for (let m = 1; m <= 10; m++) {
-        const checkboxBlanche = document.getElementById(`blanche-${m}`);
-        const checkboxZa = document.getElementById(`za-${m}`);
-        const bonusContainer = document.getElementById(`bonus-container-${m}`);
-        const scoreMancheSpan = document.getElementById(`score-m-${m}`);
-        const mancheCard = scoreMancheSpan.closest('.manche-card'); 
-
-        let billes = scoresState[m];
+        for (let m = 1; m <= 10; m++) {
+        const cache = gameEngine.domCache[m];
+        let billes = gameEngine.scoresState[m];
         let scoreManche = 0;
 
-        mancheCard.classList.remove('manche-foul', 'manche-parfaite', 'manche-encours');
+                // Nettoyage complet des classes d'état de la carte
+        cache.card.classList.remove('manche-foul', 'manche-parfaite', 'manche-encours', 'manche-za', 'manche-zero');
 
-        const btnMax = mancheCard.querySelector('.btn-max');
-        if (scoresState[m] === m) {
-            btnMax.style.backgroundColor = 'var(--accent-blue, #3b82f6)';
+        // Style du bouton max
+        cache.btnMax.style.backgroundColor = (billes === m) ? 'var(--accent-blue, #3b82f6)' : '#334155';
+
+        // Visibilité de la Zone d'Ajustement (ZA)
+        if (billes === m && !cache.blanche.checked) {
+            cache.bonusContainer.style.visibility = 'visible';
         } else {
-            btnMax.style.backgroundColor = '#334155'; // Couleur neutre par défaut
+            cache.bonusContainer.style.visibility = 'hidden';
+            cache.za.checked = false; 
         }
 
-        // CONDITION CORRIGÉE : ZA visible UNIQUEMENT si le max est atteint ET qu'il n'y a pas de faute (blanche)
-        if (billes === m && !checkboxBlanche.checked) {
-            bonusContainer.style.visibility = 'visible';
-        } else {
-            bonusContainer.style.visibility = 'hidden';
-            checkboxZa.checked = false; // Décoche automatiquement si les conditions ne sont plus remplies
-        }
-
-        // Calcul du score de la manche
-        if (checkboxBlanche.checked) {
+        // --- CALCUL DU SCORE ET ATTRIBUTION DES COULEURS ---
+        if (cache.blanche.checked) {
             scoreManche = 0;
-            mancheCard.classList.add('manche-foul');
+            cache.card.classList.add('manche-foul'); // ROUGE (Faute)
         } else {
             scoreManche = billes;
 
             if (billes === m) {
-                scoreManche = scoreManche * 2;
-                
-                if (checkboxZa.checked) {
+                scoreManche *= 2;
+                if (cache.za.checked) {
                     scoreManche += 5;
-                    mancheCard.classList.add('manche-parfaite');
-                } else if (scoreManche > 0) {
-                    mancheCard.classList.add('manche-encours');
+                    cache.card.classList.add('manche-za'); // JAUNE (ZA activé)
+                } else {
+                    cache.card.classList.add('manche-parfaite'); // VERT (Maximum atteint sans ZA)
                 }
             } else if (scoreManche > 0) {
-                mancheCard.classList.add('manche-encours');
+                cache.card.classList.add('manche-encours'); // BLANCHE (Entre 0 et Max)
+            } else {
+                cache.card.classList.add('manche-zero'); // GRIS PÂLE (Par défaut à 0)
             }
         }
 
-        scoreMancheSpan.innerText = scoreManche;
+
+
+        cache.scoreMancheSpan.textContent = scoreManche;
         scoreTotal += scoreManche;
     }
 
-    totalSpan.innerText = scoreTotal;
 
-    let pourcentage = parseInt(ajustementSlider.value) || 0;
-    ajustementTxt.innerText = pourcentage > 0 ? `+${pourcentage}%` : `${pourcentage}%`;
+    totalSpan.textContent = scoreTotal;
 
-    // --- DYNAMISATION DE LA COULEUR DU SLIDER ---
+    // Gestion de l'ajustement (Remplacement des styles inline par un dataset ou des classes si possible, conservé ici pour compatibilité CSS)
+    const pourcentage = parseInt(ajustementSlider.value) || 0;
+    ajustementTxt.textContent = pourcentage > 0 ? `+${pourcentage}%` : `${pourcentage}%`;
+
+        // --- DYNAMISATION DU SLIDER VIA CLASSES CSS ---
+    // On cible le parent commun pour appliquer l'état global
+    const conteneurSlider = ajustementSlider.parentElement; 
+    
+    // On nettoie les anciennes classes d'état
+    conteneurSlider.classList.remove('slider-positive', 'slider-negative', 'slider-neutral');
+
     if (pourcentage > 0) {
-        ajustementSlider.style.backgroundColor = 'var(--accent-green, #10b981)';
-        ajustementTxt.style.color = 'var(--accent-green, #10b981)';
-        ajustementTxt.style.background = 'rgba(16, 185, 129, 0.15)';
+        conteneurSlider.classList.add('slider-positive');
     } else if (pourcentage < 0) {
-        ajustementSlider.style.backgroundColor = 'var(--accent-red, #ef4444)';
-        ajustementTxt.style.color = 'var(--accent-red, #ef4444)';
-        ajustementTxt.style.background = 'rgba(239, 68, 68, 0.15)';
+        conteneurSlider.classList.add('slider-negative');
     } else {
-        ajustementSlider.style.backgroundColor = '#334155'; 
-        ajustementTxt.style.color = 'var(--accent-blue, #3b82f6)';
-        ajustementTxt.style.background = 'rgba(59, 130, 246, 0.15)';
+        conteneurSlider.classList.add('slider-neutral');
     }
 
-    let multiplicateur = 1 + (pourcentage / 100);
-    let scoreFinal = Math.round(scoreTotal * multiplicateur);
 
-    if (scoreFinal < 0) scoreFinal = 0;
-    finalScoreSpan.innerText = scoreFinal;
+    const scoreFinal = Math.max(0, Math.round(scoreTotal * (1 + (pourcentage / 100))));
+    finalScoreSpan.textContent = scoreFinal;
 }
 
+function genererOptionsSelecteur(manche) {
+    const cache = gameEngine.domCache[manche];
+    cache.grid.innerHTML = ''; 
+    
+    const valeurActuelle = gameEngine.scoresState[manche];
+    
+    // Utilisation d'un DocumentFragment pour optimiser les insertions dans le DOM
+    const fragment = document.createDocumentFragment();
+    
+    for (let i = 0; i <= manche; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'btn-select-val';
+        btn.textContent = i;
+        
+        if (i === valeurActuelle) {
+            btn.classList.add('is-active');
+        }
+        
+        btn.addEventListener('click', () => selectionnerValeur(manche, i));
+        fragment.appendChild(btn);
+    }
+    cache.grid.appendChild(fragment);
+}
 
+function toggleSelecteur(manche) {
+    const cache = gameEngine.domCache[manche];
+    const estMasque = cache.selecteur.style.display === 'none';
+    
+    // Ferme tous les autres sélecteurs ouverts via le cache global
+    Object.keys(gameEngine.domCache).forEach(m => {
+        gameEngine.domCache[m].selecteur.style.display = 'none';
+    });
+    
+    if (estMasque) {
+        genererOptionsSelecteur(manche);
+        cache.selecteur.style.display = 'block';
+    }
+}
 
+function selectionnerValeur(manche, valeur) {
+    gameEngine.scoresState[manche] = valeur;
+    gameEngine.domCache[manche].valBilles.textContent = valeur;
+    toggleSelecteur(manche); // Ferme le sélecteur
+    calculerScore();
+}
 
-
-// Réinitialisation complète de la grille de jeu
 function reinitialiserPartie() {
     if (confirm("Voulez-vous vraiment remettre tous les scores et l'ajustement à zéro ?")) {
         ajustementSlider.value = 0;
         for (let m = 1; m <= 10; m++) {
-            scoresState[m] = 0;
-            document.getElementById(`val-billes-${m}`).innerText = 0;
-            document.getElementById(`blanche-${m}`).checked = false;
-            document.getElementById(`za-${m}`).checked = false;
+            gameEngine.scoresState[m] = 0;
+            const cache = gameEngine.domCache[m];
+            cache.valBilles.textContent = 0;
+            cache.blanche.checked = false;
+            cache.za.checked = false;
         }
         calculerScore();
     }
 }
 
-
-// Génère les boutons du mini-sélecteur avec uniquement le score actuel allumé
-function genererOptionsSelecteur(manche) {
-    const grid = document.getElementById(`grid-${manche}`);
-    grid.innerHTML = ''; // Reset de la grille
-    
-    let valeurActuelle = scoresState[manche];
-    
-    for (let i = 0; i <= manche; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'btn-select-val';
-        btn.innerText = i;
-        
-        // Uniquement le chiffre du pointage de la manche s'allume
-        if (i === valeurActuelle) {
-            btn.classList.add('is-active');
-        }
-        
-        btn.onclick = function() {
-            selectionnerValeur(manche, i);
-        };
-        grid.appendChild(btn);
-    }
-}
-
-
-// Ouvre ou ferme le mini-sélecteur pour une manche donnée
-function toggleSelecteur(manche) {
-    const selecteur = document.getElementById(`selecteur-${manche}`);
-    const estMasque = selecteur.style.display === 'none';
-    
-    // Ferme tous les autres sélecteurs ouverts
-    document.querySelectorAll('.mini-selecteur').forEach(el => el.style.display = 'none');
-    
-    if (estMasque) {
-        // IMPORTANT : On regénère les options pour appliquer la surbrillance au chiffre actuel
-        genererOptionsSelecteur(manche);
-        selecteur.style.display = 'block';
-    } else {
-        selecteur.style.display = 'none';
-    }
-}
-
-// Assigne la valeur choisie depuis le sélecteur
-function selectionnerValeur(manche, valeur) {
-    scoresState[manche] = valeur;
-    document.getElementById(`val-billes-${manche}`).innerText = valeur;
-    
-    // Ferme le sélecteur après sélection
-    toggleSelecteur(manche);
-    
-    // Recalcule le score global et met à jour l'interface
-    calculerScore();
-}
-
-
-// Optionnel : Fermer les sélecteurs si on clique en dehors de la carte de manche
-document.addEventListener('click', function(event) {
+// Fermeture des sélecteurs lors d'un clic extérieur
+document.addEventListener('click', (event) => {
     if (!event.target.closest('.counter-group-wrapper')) {
-        document.querySelectorAll('.mini-selecteur').forEach(el => el.style.display = 'none');
+        Object.keys(gameEngine.domCache).forEach(m => {
+            gameEngine.domCache[m].selecteur.style.display = 'none';
+        });
     }
 });
-
