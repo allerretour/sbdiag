@@ -49,12 +49,19 @@ function modifierBilles(manche, changement) {
     }
 }
 
-// Fonction pour mettre le compteur au maximum de la manche
+// Fonction pour basculer le compteur entre le maximum et 0
 function maximerBilles(manche) {
-    scoresState[manche] = manche; // Le maximum correspond au numéro de la manche
-    document.getElementById(`val-billes-${manche}`).innerText = manche;
+    // Si la manche est déjà au maximum, on remet à 0, sinon on met au maximum
+    if (scoresState[manche] === manche) {
+        scoresState[manche] = 0;
+    } else {
+        scoresState[manche] = manche;
+    }
+    
+    document.getElementById(`val-billes-${manche}`).innerText = scoresState[manche];
     calculerScore();
 }
+
 
 
 // Fonction globale pour calculer les points et appliquer l'ajustement
@@ -73,7 +80,16 @@ function calculerScore() {
 
         mancheCard.classList.remove('manche-foul', 'manche-parfaite', 'manche-encours');
 
-        if (checkboxBlanche.checked) {
+        // À insérer dans la boucle 'for (let m = 1; m <= 10; m++)' de votre fonction calculerScore()
+const btnMax = mancheCard.querySelector('.btn-max');
+if (scoresState[m] === m) {
+    btnMax.style.backgroundColor = 'var(--accent-blue, #3b82f6)';
+} else {
+    btnMax.style.backgroundColor = '#334155'; // Couleur neutre par défaut
+}
+
+		
+		if (checkboxBlanche.checked) {
             scoreManche = 0;
             bonusContainer.style.visibility = 'hidden';
             checkboxZa.checked = false;
@@ -105,20 +121,22 @@ function calculerScore() {
     let pourcentage = parseInt(ajustementSlider.value) || 0;
     ajustementTxt.innerText = pourcentage > 0 ? `+${pourcentage}%` : `${pourcentage}%`;
 
-    // --- DYNAMISATION DE LA COULEUR DU SLIDER ---
+         // --- DYNAMISATION DE LA COULEUR DU SLIDER ---
     if (pourcentage > 0) {
-        ajustementSlider.style.background = 'var(--accent-green)';
-        ajustementTxt.style.color = 'var(--accent-green)';
+        ajustementSlider.style.backgroundColor = 'var(--accent-green, #10b981)';
+        ajustementTxt.style.color = 'var(--accent-green, #10b981)';
         ajustementTxt.style.background = 'rgba(16, 185, 129, 0.15)';
     } else if (pourcentage < 0) {
-        ajustementSlider.style.background = 'var(--accent-red)';
-        ajustementTxt.style.color = 'var(--accent-red)';
+        ajustementSlider.style.backgroundColor = 'var(--accent-red, #ef4444)';
+        ajustementTxt.style.color = 'var(--accent-red, #ef4444)';
         ajustementTxt.style.background = 'rgba(239, 68, 68, 0.15)';
     } else {
-        ajustementSlider.style.background = '#334155'; // Gris neutre par défaut
-        ajustementTxt.style.color = 'var(--accent-blue)';
+        ajustementSlider.style.backgroundColor = '#334155'; // Gris neutre par défaut à 0%
+        ajustementTxt.style.color = 'var(--accent-blue, #3b82f6)';
         ajustementTxt.style.background = 'rgba(59, 130, 246, 0.15)';
     }
+
+
 
     let multiplicateur = 1 + (pourcentage / 100);
     let scoreFinal = Math.round(scoreTotal * multiplicateur);

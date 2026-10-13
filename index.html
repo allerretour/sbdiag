@@ -90,28 +90,31 @@
             padding: 2px 8px;
             border-radius: 20px;
         }
+		
+#ajustement-slider {
+    -webkit-appearance: none;  /* Supprime le style natif Chrome/Safari */
+    appearance: none;          /* Supprime le style natif standard */
+    width: 100%;
+    height: 8px;               /* Ajustez l'épaisseur de la barre */
+	background-color: #334155; /* <--- FORCE LE GRIS DÈS LE DÉPART */
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+}
 
-                .slider {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 6px;
-            border-radius: 5px;
-            background: #334155;
-            outline: none;
-            transition: background 0.3s ease; /* Ajoute un effet de fondu fluide */
-        }
+/* Style du bouton rond pour pouvoir toujours le déplacer */
+#ajustement-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid #334155;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
 
 
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--accent-blue);
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-        }
 
         /* Liste des Manches */
         .manches-container {
@@ -303,7 +306,8 @@
                 <span>Ajustement</span>
                 <span id="ajustement-txt">0%</span>
             </div>
-            <input type="range" id="ajustement-slider" class="slider" min="-50" max="50" value="0" oninput="calculerScore()">
+            <input type="range" id="ajustement-slider" min="-50" max="50" value="0" step="5" oninput="calculerScore()">
+
         </div>
 
         <!-- Action principale -->
