@@ -14,7 +14,7 @@ for (let m = 1; m <= 10; m++) {
     div.className = 'manche-card';
     div.innerHTML = `
         <div class="manche-info">
-            M.${m} <span>Max: ${m}</span>
+            Manche #${m} <span>Bille: ${m}</span>
         </div>
         <div class="counter-group">
             <button class="btn-touch" onclick="modifierBilles(${m}, -1)">-</button>

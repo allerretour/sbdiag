@@ -30,8 +30,8 @@
             width: 100%;
             max-width: 500px;
             background: #161f33;
-            border-radius: 20px;
-            padding: 20px;
+            border-radius: 10px;
+            padding: 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
@@ -39,9 +39,9 @@
         .header-score {
             text-align: center;
             background: linear-gradient(135deg, #1e2942 0%, #0f172a 100%);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 10px;
+            padding: 8px;
+            margin-bottom: 10px;
             border: 1px solid rgba(255,255,255,0.05);
         }
 
@@ -54,16 +54,17 @@
         }
 
         .final-score-display {
-            font-size: 64px;
+            font-size: 60px;
             font-weight: 800;
             color: var(--text-main);
             line-height: 1;
-            margin: 10px 0;
+            margin: 8px 0;
             text-shadow: 0 0 20px rgba(255,255,255,0.1);
         }
 
         .raw-score {
-            font-size: 14px;
+            font-size: 12px;
+			text-align: right;
             color: var(--text-muted);
         }
 
@@ -117,23 +118,23 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .manche-card {
             background: var(--card-bg);
-            border-radius: 14px;
-            padding: 12px 16px;
+            border-radius: 10px;
+            padding: 4px 16px;
             display: grid;
             grid-template-columns: 1.2fr 1.5fr 1fr 1fr 0.8fr;
             align-items: center;
-            gap: 10px;
+            gap: 2px;
             border: 1px solid rgba(255,255,255,0.02);
         }
 
         .manche-info {
             font-weight: 700;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .manche-info span {
@@ -161,7 +162,7 @@
             width: 32px;
             height: 32px;
             border-radius: 6px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
@@ -194,7 +195,7 @@
             height: 36px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 700;
             transition: all 0.2s;
             border: 2px solid transparent;
@@ -234,7 +235,7 @@
         /* Colonne Score Final par Manche */
         .score-manche {
             text-align: right;
-            font-size: 18px;
+            font-size: 30px;
             font-weight: 700;
             color: var(--accent-green);
         }
@@ -245,8 +246,8 @@
             background: #27314f;
             color: #f8fafc;
             border: none;
-            padding: 14px;
-            border-radius: 12px;
+            padding: 12px;
+            border-radius: 10px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
@@ -286,7 +287,7 @@
         <div class="container">
         <!-- Dashboard des Scores -->
         <div class="header-score">
-            <h1>Score Billard</h1>
+            <h1>Carte de pointage</h1>
             <div class="final-score-display"><span id="final-score">0</span><span style="font-size: 24px; color:var(--text-muted);"> pts</span></div>
             <div class="raw-score">Points Bruts : <span id="total">0</span> pts</div>
         </div>
