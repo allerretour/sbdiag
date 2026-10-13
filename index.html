@@ -284,6 +284,103 @@
             border-color: rgba(245, 158, 11, 0.3) !important;
         }
 		
+	/* Style du chiffre central transformé en bouton cliquable */
+/* Réduction de la largeur de la case/bouton du nombre de billes */
+.main-trigger {
+    cursor: pointer;
+    width: 42px;           /* Largeur fixe étroite */
+    height: 42px;          /* Hauteur identique pour créer un bouton carré parfait */
+    display: flex;
+    align-items: center;   /* Centre le chiffre verticalement */
+    justify-content: center;/* Centre le chiffre horizontalement */
+    background: #1e293b;
+    border: 2px solid #334155;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.1rem;     /* Taille du chiffre bien lisible */
+    transition: background 0.2s, border-color 0.2s;
+    user-select: none;
+    box-sizing: border-box; /* Intègre la bordure dans le calcul des 42px */
+	margin-left: 30px; /* Ajustez cette valeur (ex: 15px, 25px) pour déplacer plus ou moins la case */
+}
+
+/* Conserve le changement de couleur au survol */
+.main-trigger:hover {
+    background: #334155;
+    border-color: var(--accent-blue, #3b82f6);
+}
+
+
+/* Positionnement de l'enveloppe */
+.counter-group-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* Conteneur du mini-sélecteur de points */
+.mini-selecteur {
+    position: absolute;
+    top: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    border: 1px solid #475569;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    z-index: 50;
+    padding: 10px;
+    min-width: 140px;
+}
+
+/* Grille des chiffres dans le sélecteur */
+.selecteur-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Ajustez le nombre de colonnes selon vos besoins */
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+/* Bouton individuel de chiffre */
+.btn-select-val {
+    background: #334155;
+    color: #f8fafc;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.btn-select-val:hover {
+    background: #475569;
+}
+
+
+
+/* Bouton pour fermer le popover sans changer le score */
+.btn-close-selecteur {
+    width: 100%;
+    background: transparent;
+    color: #94a3b8;
+    border: 1px dashed #475569;
+    padding: 4px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+}
+.btn-close-selecteur:hover {
+    color: #f1f5f9;
+    background: rgba(255,255,255,0.05);
+}
+/* Style pour le chiffre actuellement sélectionné dans le sélecteur */
+.btn-select-val.is-active {
+    background-color: var(--accent-green, #10b981) !important;
+    color: #ffffff;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    transform: scale(1.05);
+}
+
+	
+		
 		
     </style>
 </head>
