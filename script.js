@@ -20,6 +20,7 @@ for (let m = 1; m <= 10; m++) {
             <button class="btn-touch" onclick="modifierBilles(${m}, -1)">-</button>
             <div class="billes-val" id="val-billes-${m}">0</div>
             <button class="btn-touch" onclick="modifierBilles(${m}, 1)">+</button>
+            <button class="btn-touch btn-max" onclick="maximerBilles(${m})">M</button>
         </div>
         <div class="input-cell">
             <label class="cb-touch-label cb-foul" title="Blanche empochée (0 pt)">
@@ -36,6 +37,7 @@ for (let m = 1; m <= 10; m++) {
     manchesList.appendChild(div);
 }
 
+
 // Gestion de l'incrémentation/décrémentation des billes empochées
 function modifierBilles(manche, changement) {
     let nvValeur = scoresState[manche] + changement;
@@ -46,6 +48,14 @@ function modifierBilles(manche, changement) {
         calculerScore();
     }
 }
+
+// Fonction pour mettre le compteur au maximum de la manche
+function maximerBilles(manche) {
+    scoresState[manche] = manche; // Le maximum correspond au numéro de la manche
+    document.getElementById(`val-billes-${manche}`).innerText = manche;
+    calculerScore();
+}
+
 
 // Fonction globale pour calculer les points et appliquer l'ajustement
 function calculerScore() {
