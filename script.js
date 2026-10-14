@@ -242,6 +242,11 @@ function calculerScore() {
     document.getElementById('stat-parfaites').textContent = totalManchesParfaites;
     document.getElementById('stat-za').textContent = totalZA;
     document.getElementById('stat-fautes').textContent = totalFautes;
+
+    // NOUVELLES TUILES DE SCORE
+    document.getElementById('stat-score-brut').textContent = scoreTotal;
+    document.getElementById('stat-score-net').textContent = scoreFinal;
+
 }
 
 function genererOptionsSelecteur(manche) {

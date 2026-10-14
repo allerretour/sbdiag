@@ -679,6 +679,11 @@
                 <option value="8">8</option>
                 <option value="9">9</option>
                 <option value="10" selected>10</option>
+                <option value="11">11</option>
+    		<option value="12">12</option>
+    		<option value="13">13</option>
+    		<option value="14">14</option>
+    		<option value="15">15</option>
         </select>
     </div>
 
@@ -695,6 +700,19 @@
 <div class="stats-container">
     <h3 class="stats-title">Statistiques de la Partie</h3>
     <div class="stats-grid">
+
+<div class="stat-card">
+    <div class="stat-icon">📊</div>
+    <span>Score Brut</span>
+    <span id="stat-score-brut">0</span>
+</div>
+<div class="stat-card">
+    <div class="stat-icon">🏆</div>
+    <span>Score Net</span>
+    <span id="stat-score-net">0</span>
+</div>
+
+
         <div class="stat-card">
             <span class="stat-icon">⚪</span>
             <div class="stat-info">
@@ -712,7 +730,7 @@
         <div class="stat-card">
             <span class="stat-icon">🎯</span>
             <div class="stat-info">
-                <span class="stat-label">Zones d'Ajustement</span>
+                <span class="stat-label">Zones d'arrivé</span>
                 <span class="stat-value" id="stat-za">0</span>
             </div>
         </div>
