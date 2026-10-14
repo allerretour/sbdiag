@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compteur de Billard Premium</title>
+    <title>Carte de pointage</title>
     <style>
         :root {
             --bg-dark: #121824;
@@ -156,6 +156,24 @@
 
 /* --- RESPONSIVE MOBILE --- */
 @media (max-width: 520px) {
+    
+    body {
+        padding: 10px; /* Réduit l'espace autour de l'application */
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 8px; /* Réduit l'espace sous le titre principal */
+    }
+
+    header {
+        margin-bottom: 12px; /* Réduit l'espace entre le bloc titre/sélecteur et le score */
+    }
+
+    .setup-bar {
+        padding: 8px 12px; /* Rend la barre de sélection plus compacte */
+    }
+
     .header-score {
         flex-direction: column;
         text-align: center;
