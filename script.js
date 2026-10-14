@@ -29,16 +29,14 @@ const gameEngine = {
 const selectManches = document.getElementById('select-manches');
 let nbManchesActuel = 10; // Par défaut
 
-// Fonction principale pour générer la grille des manches
 function initialiserGrille(nbManches) {
-    // On vide l'ancien contenu HTML et le cache
     manchesList.innerHTML = '';
     gameEngine.scoresState = {};
     gameEngine.domCache = {};
     nbManchesActuel = nbManches;
 
     for (let m = 1; m <= nbManches; m++) {
-        gameEngine.scoresState[m] = 0;
+        gameEngine.scoresState[m] = null; // <-- État initial à null
         
         const div = document.createElement('div');
         div.className = 'manche-card';
@@ -46,7 +44,7 @@ function initialiserGrille(nbManches) {
         div.innerHTML = `
             <div class="manche-info">Manche #${m} <span>${m} Bille(s)</span></div>
             <div class="counter-group-wrapper">
-                <div class="billes-val main-trigger" id="val-billes-${m}">0</div>
+                <div class="billes-val main-trigger" id="val-billes-${m}">-</div>
                 <div class="mini-selecteur" id="selecteur-${m}" style="display: none;">
                     <div class="selecteur-grid" id="grid-${m}"></div>
                     <button class="btn-close-selecteur">Fermer</button>
@@ -139,13 +137,17 @@ function calculerScore() {
 
     for (let m = 1; m <= nbManchesActuel; m++) {
         const cache = gameEngine.domCache[m];
-        let billes = gameEngine.scoresState[m];
+        let scoreBrut = gameEngine.scoresState[m]; 
+        let billes = scoreBrut === null ? 0 : scoreBrut; 
         let scoreManche = 0;
 
-        cache.card.classList.remove('manche-foul', 'manche-parfaite', 'manche-encours', 'manche-za', 'manche-zero');
-        cache.btnMax.style.backgroundColor = (billes === m) ? 'var(--accent-blue, #3b82f6)' : '#334155';
+        // Met à jour l'affichage de la bulle principale (tiret si null, sinon le chiffre)
+        cache.valBilles.textContent = scoreBrut === null ? '-' : scoreBrut;
 
-        if (billes === m && !cache.blanche.checked) {
+        cache.card.classList.remove('manche-foul', 'manche-parfaite', 'manche-encours', 'manche-za', 'manche-zero');
+        cache.btnMax.style.backgroundColor = (scoreBrut === m) ? 'var(--accent-blue, #3b82f6)' : '#334155';
+
+        if (scoreBrut === m && !cache.blanche.checked) {
             cache.bonusContainer.style.visibility = 'visible';
         } else {
             cache.bonusContainer.style.visibility = 'hidden';
@@ -158,38 +160,42 @@ function calculerScore() {
         } else {
             scoreManche = billes;
 
-            if (billes === m) {
-                // Utilisation du multiplicateur de la configuration
+            if (scoreBrut === null) {
+                // État initial non choisi : Thème neutre par défaut
+                cache.card.classList.add('manche-zero'); 
+                scoreManche = '-'; // <-- On force l'affichage du tiret pour le total de la manche
+            } else if (scoreBrut === m) {
                 scoreManche *= CONFIG_SCORES.multiplicateurMancheParfaite;
                 if (cache.za.checked) {
-                    // Utilisation du bonus ZA configuré
                     scoreManche += CONFIG_SCORES.bonusZA;
                     cache.card.classList.add('manche-za'); 
                 } else {
                     cache.card.classList.add('manche-parfaite'); 
                 }
-            } else if (scoreManche > 0) {
-                cache.card.classList.add('manche-encours'); 
             } else {
-                cache.card.classList.add('manche-zero'); 
+                // N'importe quel chiffre choisi (y compris le 0) active la manche en cours
+                cache.card.classList.add('manche-encours'); 
             }
         }
 
+        // On affiche le score calculé ou le tiret si la manche n'est pas commencée
         cache.scoreMancheSpan.textContent = scoreManche;
-        scoreTotal += scoreManche;
+        
+        // Pour le cumul global, on ajoute 0 si scoreManche vaut '-'
+        scoreTotal += (scoreManche === '-') ? 0 : scoreManche;
     }
 
     totalSpan.textContent = scoreTotal;
 
-    // --- CALCUL DU CUMUL DES MALUS (Utilise les variables configurées) ---
     let totalMalus = 0;
     if (btnAjustTable.checked) totalMalus += CONFIG_SCORES.malusTable;
     if (btnAjustPoche.checked) totalMalus += CONFIG_SCORES.malusPoche;
 
-    // Application du pourcentage cumulé au score final
     const scoreFinal = Math.max(0, Math.round(scoreTotal * (1 + (totalMalus / 100))));
     finalScoreSpan.textContent = scoreFinal;
 }
+
+
 
 function genererOptionsSelecteur(manche) {
     const cache = gameEngine.domCache[manche];
@@ -240,13 +246,12 @@ function reinitialiserPartie() {
         btnAjustPoche.checked = false;
         
         for (let m = 1; m <= nbManchesActuel; m++) {
-            gameEngine.scoresState[m] = 0;
+            gameEngine.scoresState[m] = null; // <-- Remet à null pour réactiver le tiret
             const cache = gameEngine.domCache[m];
-            cache.valBilles.textContent = 0;
             cache.blanche.checked = false;
             cache.za.checked = false;
         }
-        calculerScore();
+        calculerScore(); // Re-génère les tirets et les styles d'origine
     }
 }
 
