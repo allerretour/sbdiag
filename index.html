@@ -574,7 +574,66 @@
     transform: scale(1.05);
 }
 
-	
+
+
+/* Conteneur principal de la ligne du bas */
+.footer-controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Espace le sélecteur à gauche et les options à droite */
+    gap: 16px;
+    padding: 12px 16px;
+    background-color: #1e293b;       /* Fond sombre pour délimiter le menu du bas */
+    border-top: 1px solid #334155;
+    margin-top: 20px;
+    border-radius: 8px;              /* Optionnel : à retirer si vous voulez qu'il colle aux bords de l'écran */
+}
+
+/* Style compact pour le choix des manches */
+.select-manches-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #f8fafc;
+}
+
+.select-manches-wrapper select {
+    padding: 4px 8px;
+    background-color: #0f172a;
+    color: white;
+    border: 1px solid #475569;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* Conteneur des cases à cocher */
+.ajustement-container {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+/* Style des labels et des cases */
+.ajust-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #f8fafc;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ajust-label input[type="checkbox"] {
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+    accent-color: #ef4444; /* Coche rouge pour indiquer le malus */
+}
+
+
 		
 		
     </style>
@@ -602,28 +661,21 @@
         <!-- Grille des Manches (générée par script.js) -->
         <div class="manches-container" id="manches-list"></div>
 
-        <!-- Section Ajustement / Handicap (DÉPLACÉE EN BAS) -->
-        <div class="adjustment-section">
-            <div class="adjustment-label">
-                <span>Ajustement</span>
-                <span id="ajustement-txt">0%</span>
-            </div>
-            <input type="range" id="ajustement-slider" min="-50" max="50" value="0" step="5" oninput="calculerScore()">
-			
-			
+       
 
-        </div>
 		
 		
 
         <!-- Action principale -->
         <button class="btn-reset" onclick="reinitialiserPartie()">Réinitialiser la partie</button>
-		
-		
-		<div class="nb-manches-selector">
-            <label for="select-manches">Manches :</label>
-            <select id="select-manches">
-                <option value="1">1</option>
+
+
+<!-- À placer tout en bas de votre interface de jeu -->
+<div class="footer-controls-row">
+    <div class="select-manches-wrapper">
+        <label for="select-manches">Manches </label>
+        <select id="select-manches">
+            <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
@@ -633,8 +685,19 @@
                 <option value="8">8</option>
                 <option value="9">9</option>
                 <option value="10" selected>10</option>
-            </select>
-        </div>
+        </select>
+    </div>
+
+    <div class="ajustement-container">
+        <label class="ajust-label">
+            <input type="checkbox" id="btn-ajust-table"> Table h.s. -15%
+        </label>
+        <label class="ajust-label">
+            <input type="checkbox" id="btn-ajust-poche"> Poches h.s -10%
+        </label>
+    </div>
+</div>
+
 		
     </div>
 	

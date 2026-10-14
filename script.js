@@ -1,8 +1,23 @@
+// ==========================================
+// CONFIGURATION DES SCORES ET CONFIG DU JEU
+// ==========================================
+const CONFIG_SCORES = {
+    malusTable: -15, // Pourcentage d'ajustement pour la table (-15%)
+    malusPoche: -10, // Pourcentage d'ajustement pour la poche (-10%)
+    bonusZA: 5,      // Points bonus pour la Zone d'Ajustement (ZA)
+    multiplicateurMancheParfaite: 2 // Multiplicateur si toutes les billes sont rentrées
+};
+
 const manchesList = document.getElementById('manches-list');
 const totalSpan = document.getElementById('total');
 const finalScoreSpan = document.getElementById('final-score');
-const ajustementSlider = document.getElementById('ajustement-slider');
-const ajustementTxt = document.getElementById('ajustement-txt');
+
+// Nouveaux éléments du DOM pour les boutons d'ajustement
+const btnAjustTable = document.getElementById('btn-ajust-table');
+const btnAjustPoche = document.getElementById('btn-ajust-poche');
+
+// Variable globale pour stocker la valeur de l'ajustement en cours
+let pourcentageAjustement = 0;
 
 // Stockage centralisé des scores ET des références du DOM pour éviter les lookups répétitifs
 const gameEngine = {
@@ -48,7 +63,7 @@ function initialiserGrille(nbManches) {
                 </label>
             </div>
             <div class="input-cell">
-                <label id="bonus-container-${m}" class="cb-touch-label cb-za" title="Blanche dans la ZA (+5 pts)" style="visibility: hidden;">
+                <label id="bonus-container-${m}" class="cb-touch-label cb-za" title="Blanche dans la ZA (+${CONFIG_SCORES.bonusZA} pts)" style="visibility: hidden;">
                     <input type="checkbox" id="za-${m}">
                 </label>
             </div>
@@ -91,9 +106,17 @@ selectManches.addEventListener('change', (e) => {
 // Lancement initial de la grille avec 10 manches par défaut
 initialiserGrille(10);
 
-// Écouteur sur le slider
-ajustementSlider.addEventListener('change', calculerScore);
+// --- GESTION DES CASES À COCHER D'AJUSTEMENT ---
+// Déclenche le calcul automatique dès qu'une case est cochée ou décochée
+btnAjustTable.addEventListener('change', calculerScore);
+btnAjustPoche.addEventListener('change', calculerScore);
 
+function mettreAJourDesignBoutons() {
+    if (pourcentageAjustement === 0) {
+        btnAjustTable.classList.remove('is-active');
+        btnAjustPoche.classList.remove('is-active');
+    }
+}
 
 function modifierBilles(manche, changement) {
     let nvValeur = gameEngine.scoresState[manche] + changement;
@@ -114,19 +137,14 @@ function maximerBilles(manche) {
 function calculerScore() {
     let scoreTotal = 0;
 
-        // Remplacer le 10 par nbManchesActuel
-		for (let m = 1; m <= nbManchesActuel; m++) {
+    for (let m = 1; m <= nbManchesActuel; m++) {
         const cache = gameEngine.domCache[m];
         let billes = gameEngine.scoresState[m];
         let scoreManche = 0;
 
-                // Nettoyage complet des classes d'état de la carte
         cache.card.classList.remove('manche-foul', 'manche-parfaite', 'manche-encours', 'manche-za', 'manche-zero');
-
-        // Style du bouton max
         cache.btnMax.style.backgroundColor = (billes === m) ? 'var(--accent-blue, #3b82f6)' : '#334155';
 
-        // Visibilité de la Zone d'Ajustement (ZA)
         if (billes === m && !cache.blanche.checked) {
             cache.bonusContainer.style.visibility = 'visible';
         } else {
@@ -134,58 +152,42 @@ function calculerScore() {
             cache.za.checked = false; 
         }
 
-        // --- CALCUL DU SCORE ET ATTRIBUTION DES COULEURS ---
         if (cache.blanche.checked) {
             scoreManche = 0;
-            cache.card.classList.add('manche-foul'); // ROUGE (Faute)
+            cache.card.classList.add('manche-foul'); 
         } else {
             scoreManche = billes;
 
             if (billes === m) {
-                scoreManche *= 2;
+                // Utilisation du multiplicateur de la configuration
+                scoreManche *= CONFIG_SCORES.multiplicateurMancheParfaite;
                 if (cache.za.checked) {
-                    scoreManche += 5;
-                    cache.card.classList.add('manche-za'); // JAUNE (ZA activé)
+                    // Utilisation du bonus ZA configuré
+                    scoreManche += CONFIG_SCORES.bonusZA;
+                    cache.card.classList.add('manche-za'); 
                 } else {
-                    cache.card.classList.add('manche-parfaite'); // VERT (Maximum atteint sans ZA)
+                    cache.card.classList.add('manche-parfaite'); 
                 }
             } else if (scoreManche > 0) {
-                cache.card.classList.add('manche-encours'); // BLANCHE (Entre 0 et Max)
+                cache.card.classList.add('manche-encours'); 
             } else {
-                cache.card.classList.add('manche-zero'); // GRIS PÂLE (Par défaut à 0)
+                cache.card.classList.add('manche-zero'); 
             }
         }
-
-
 
         cache.scoreMancheSpan.textContent = scoreManche;
         scoreTotal += scoreManche;
     }
 
-
     totalSpan.textContent = scoreTotal;
 
-    // Gestion de l'ajustement (Remplacement des styles inline par un dataset ou des classes si possible, conservé ici pour compatibilité CSS)
-    const pourcentage = parseInt(ajustementSlider.value) || 0;
-    ajustementTxt.textContent = pourcentage > 0 ? `+${pourcentage}%` : `${pourcentage}%`;
+    // --- CALCUL DU CUMUL DES MALUS (Utilise les variables configurées) ---
+    let totalMalus = 0;
+    if (btnAjustTable.checked) totalMalus += CONFIG_SCORES.malusTable;
+    if (btnAjustPoche.checked) totalMalus += CONFIG_SCORES.malusPoche;
 
-        // --- DYNAMISATION DU SLIDER VIA CLASSES CSS ---
-    // On cible le parent commun pour appliquer l'état global
-    const conteneurSlider = ajustementSlider.parentElement; 
-    
-    // On nettoie les anciennes classes d'état
-    conteneurSlider.classList.remove('slider-positive', 'slider-negative', 'slider-neutral');
-
-    if (pourcentage > 0) {
-        conteneurSlider.classList.add('slider-positive');
-    } else if (pourcentage < 0) {
-        conteneurSlider.classList.add('slider-negative');
-    } else {
-        conteneurSlider.classList.add('slider-neutral');
-    }
-
-
-    const scoreFinal = Math.max(0, Math.round(scoreTotal * (1 + (pourcentage / 100))));
+    // Application du pourcentage cumulé au score final
+    const scoreFinal = Math.max(0, Math.round(scoreTotal * (1 + (totalMalus / 100))));
     finalScoreSpan.textContent = scoreFinal;
 }
 
@@ -194,8 +196,6 @@ function genererOptionsSelecteur(manche) {
     cache.grid.innerHTML = ''; 
     
     const valeurActuelle = gameEngine.scoresState[manche];
-    
-    // Utilisation d'un DocumentFragment pour optimiser les insertions dans le DOM
     const fragment = document.createDocumentFragment();
     
     for (let i = 0; i <= manche; i++) {
@@ -217,7 +217,6 @@ function toggleSelecteur(manche) {
     const cache = gameEngine.domCache[manche];
     const estMasque = cache.selecteur.style.display === 'none';
     
-    // Ferme tous les autres sélecteurs ouverts via le cache global
     Object.keys(gameEngine.domCache).forEach(m => {
         gameEngine.domCache[m].selecteur.style.display = 'none';
     });
@@ -231,13 +230,15 @@ function toggleSelecteur(manche) {
 function selectionnerValeur(manche, valeur) {
     gameEngine.scoresState[manche] = valeur;
     gameEngine.domCache[manche].valBilles.textContent = valeur;
-    toggleSelecteur(manche); // Ferme le sélecteur
+    toggleSelecteur(manche); 
     calculerScore();
 }
 
 function reinitialiserPartie() {
     if (confirm("Voulez-vous vraiment remettre tous les scores et l'ajustement à zéro ?")) {
-        ajustementSlider.value = 0;
+        btnAjustTable.checked = false;
+        btnAjustPoche.checked = false;
+        
         for (let m = 1; m <= nbManchesActuel; m++) {
             gameEngine.scoresState[m] = 0;
             const cache = gameEngine.domCache[m];
@@ -249,7 +250,6 @@ function reinitialiserPartie() {
     }
 }
 
-// Fermeture des sélecteurs lors d'un clic extérieur
 document.addEventListener('click', (event) => {
     if (!event.target.closest('.counter-group-wrapper')) {
         Object.keys(gameEngine.domCache).forEach(m => {
