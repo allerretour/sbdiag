@@ -44,7 +44,7 @@ function initialiserGrille(nbManches) {
         div.className = 'manche-card';
         
         div.innerHTML = `
-            <div class="manche-info">Manche #${m} <span>Bille: ${m}</span></div>
+            <div class="manche-info">Manche #${m} <span>${m} Bille(s)</span></div>
             <div class="counter-group-wrapper">
                 <div class="billes-val main-trigger" id="val-billes-${m}">0</div>
                 <div class="mini-selecteur" id="selecteur-${m}" style="display: none;">
