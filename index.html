@@ -70,13 +70,15 @@
 .header-score {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    /* CHANGEMENT ICI : Aligne TOUT le contenu vers le haut */
+    align-items: flex-start; 
     gap: 16px;
     
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 14px;
-    padding: 14px 20px;
+    /* Réduction du padding du haut pour gagner encore plus d'espace */
+    padding: 10px 20px 14px 20px; 
     margin-bottom: 20px;
     box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.3);
 }
