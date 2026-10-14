@@ -138,6 +138,38 @@ function calculerScore() {
         let billes = scoreBrut === null ? 0 : scoreBrut; 
         let scoreManche = 0;
 
+        // =================================================================================
+        // 1. RÈGLE DE L'ORDRE CHRONOLOGIQUE
+        // Une manche est accessible uniquement si c'est la première (m===1) 
+        // OU si la manche précédente (m-1) a déjà été remplie (différente de null)
+        // =================================================================================
+        const estAccessible = (m === 1) || (gameEngine.scoresState[m - 1] !== null);
+
+        if (!estAccessible) {
+            gameEngine.scoresState[m] = null;
+            scoreBrut = null;
+            cache.card.style.pointerEvents = 'none';   // Bloque tous les clics (boutons, sélecteurs, checkbox)
+            cache.card.style.opacity = '0.4';          // Effet visuel de verrouillage
+        } else {
+            cache.card.style.pointerEvents = 'auto';
+            cache.card.style.opacity = '1';
+        }
+
+        // =================================================================================
+        // 2. RÈGLE DU BOUTON FAUTE (F)
+        // Disponible uniquement si un nombre de billes (même 0) a été choisi
+        // =================================================================================
+        if (scoreBrut === null) {
+            cache.blanche.checked = false;                     // Décoche en cas de retour à zéro
+            cache.blanche.disabled = true;                     // Bloque l'input HTML
+            cache.blanche.parentElement.style.opacity = '0.3'; // Rendu visuel désactivé
+            cache.blanche.parentElement.style.cursor = 'not-allowed';
+        } else {
+            cache.blanche.disabled = false;                    // Active l'input HTML
+            cache.blanche.parentElement.style.opacity = '1';   // Rendu visuel normal
+            cache.blanche.parentElement.style.cursor = 'pointer';
+        }
+
         // Met à jour l'affichage de la bulle principale (tiret si null, sinon le chiffre)
         cache.valBilles.textContent = scoreBrut === null ? '-' : scoreBrut;
 
@@ -212,8 +244,6 @@ function calculerScore() {
     document.getElementById('stat-fautes').textContent = totalFautes;
 }
 
-
-
 function genererOptionsSelecteur(manche) {
     const cache = gameEngine.domCache[manche];
     cache.grid.innerHTML = ''; 
@@ -237,6 +267,11 @@ function genererOptionsSelecteur(manche) {
 }
 
 function toggleSelecteur(manche) {
+    // SÉCURITÉ : Empêche d'ouvrir le sélecteur si la manche précédente n'est pas remplie
+    if (manche > 1 && gameEngine.scoresState[manche - 1] === null) {
+        return;
+    }
+
     const cache = gameEngine.domCache[manche];
     const estMasque = cache.selecteur.style.display === 'none';
     
