@@ -118,7 +118,7 @@
 /* Nouveau : Conteneur des scores repoussé vers la gauche */
 .score-cards-container {
     display: flex;
-    align-items: center;
+    align-items: flex-end;  /* Aligne le bas du badge brut avec le bas du grand chiffre */
     gap: 20px;          /* Augmentation de l'espace entre le Brut et le Final */
     margin-left: auto;   /* Pousse le point brut vers la gauche/le centre */
     padding-right: 8px; /* Laisse le score final bien calé à droite */
@@ -170,6 +170,7 @@
     .score-cards-container {
         width: 100%;
         justify-content: center;
+        align-items: center; /* Recentre verticalement les deux éléments sur mobile */
         margin-left: 0;
         padding-right: 0;
         gap: 16px;
