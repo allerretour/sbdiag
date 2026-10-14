@@ -16,9 +16,6 @@ const finalScoreSpan = document.getElementById('final-score');
 const btnAjustTable = document.getElementById('btn-ajust-table');
 const btnAjustPoche = document.getElementById('btn-ajust-poche');
 
-// Variable globale pour stocker la valeur de l'ajustement en cours
-let pourcentageAjustement = 0;
-
 // Stockage centralisé des scores ET des références du DOM pour éviter les lookups répétitifs
 const gameEngine = {
     scoresState: {},
@@ -109,12 +106,6 @@ initialiserGrille(10);
 btnAjustTable.addEventListener('change', calculerScore);
 btnAjustPoche.addEventListener('change', calculerScore);
 
-function mettreAJourDesignBoutons() {
-    if (pourcentageAjustement === 0) {
-        btnAjustTable.classList.remove('is-active');
-        btnAjustPoche.classList.remove('is-active');
-    }
-}
 
 function modifierBilles(manche, changement) {
     let nvValeur = gameEngine.scoresState[manche] + changement;
@@ -134,6 +125,12 @@ function maximerBilles(manche) {
 
 function calculerScore() {
     let scoreTotal = 0;
+    
+    // Initialisation des compteurs de statistiques
+    let totalBillesEmpochees = 0;
+    let totalManchesParfaites = 0;
+    let totalZA = 0;
+    let totalFautes = 0;
 
     for (let m = 1; m <= nbManchesActuel; m++) {
         const cache = gameEngine.domCache[m];
@@ -154,9 +151,17 @@ function calculerScore() {
             cache.za.checked = false; 
         }
 
+        // STATISTIQUE : Cumul des billes empochées (si la manche a débuté, même s'il y a faute)
+        if (scoreBrut !== null) {
+            totalBillesEmpochees += billes;
+        }
+
         if (cache.blanche.checked) {
             scoreManche = 0;
             cache.card.classList.add('manche-foul'); 
+            
+            // STATISTIQUE : Faute commise
+            totalFautes++; 
         } else {
             scoreManche = billes;
 
@@ -169,9 +174,15 @@ function calculerScore() {
                 if (cache.za.checked) {
                     scoreManche += CONFIG_SCORES.bonusZA;
                     cache.card.classList.add('manche-za'); 
+                    
+                    // STATISTIQUE : ZA obtenue
+                    totalZA++;
                 } else {
                     cache.card.classList.add('manche-parfaite'); 
                 }
+                
+                // STATISTIQUE : Manche parfaite
+                totalManchesParfaites++;
             } else {
                 // N'importe quel chiffre choisi (y compris le 0) active la manche en cours
                 cache.card.classList.add('manche-encours'); 
@@ -193,6 +204,12 @@ function calculerScore() {
 
     const scoreFinal = Math.max(0, Math.round(scoreTotal * (1 + (totalMalus / 100))));
     finalScoreSpan.textContent = scoreFinal;
+
+    // --- MISE À JOUR DE L'AFFICHAGE DES STATISTIQUES ---
+    document.getElementById('stat-billes').textContent = totalBillesEmpochees;
+    document.getElementById('stat-parfaites').textContent = totalManchesParfaites;
+    document.getElementById('stat-za').textContent = totalZA;
+    document.getElementById('stat-fautes').textContent = totalFautes;
 }
 
 
@@ -245,12 +262,15 @@ function reinitialiserPartie() {
         btnAjustTable.checked = false;
         btnAjustPoche.checked = false;
         
-        for (let m = 1; m <= nbManchesActuel; m++) {
-            gameEngine.scoresState[m] = null; // <-- Remet à null pour réactiver le tiret
-            const cache = gameEngine.domCache[m];
-            cache.blanche.checked = false;
-            cache.za.checked = false;
-        }
+        // Remplacer la boucle présente dans reinitialiserPartie par :
+	for (let m = 1; m <= nbManchesActuel; m++) {
+    		gameEngine.scoresState[m] = null;
+   		 const cache = gameEngine.domCache[m];
+    		cache.valBilles.textContent = '-'; // <--- AJOUT : Force l'affichage du tiret immédiatement
+    		cache.blanche.checked = false;
+   		 cache.za.checked = false;
+	}
+
         calculerScore(); // Re-génère les tirets et les styles d'origine
     }
 }
