@@ -228,26 +228,31 @@ function calculerScore() {
         scoreTotal += (scoreManche === '-') ? 0 : scoreManche;
     }
 
-    // totalSpan.textContent = scoreTotal;
-
+        // --- Calcul existant du score final ---
     let totalMalus = 0;
-    if (btnAjustTable.checked) totalMalus += CONFIG_SCORES.malusTable;
-    if (btnAjustPoche.checked) totalMalus += CONFIG_SCORES.malusPoche;
+    if (btnAjustTable.checked) totalMalus += CONFIG_SCORES.malusTable; //
+    if (btnAjustPoche.checked) totalMalus += CONFIG_SCORES.malusPoche; //
 
-    const scoreFinal = Math.max(0, Math.round(scoreTotal * (1 + (totalMalus / 100))));
-    finalScoreSpan.textContent = scoreFinal;
+    const scoreFinal = Math.max(0, Math.round(scoreTotal * (1 + (totalMalus / 100)))); //
 
-    // --- MISE À JOUR DE L'AFFICHAGE DES STATISTIQUES ---
-    document.getElementById('stat-billes').textContent = totalBillesEmpochees;
-    document.getElementById('stat-parfaites').textContent = totalManchesParfaites;
-    document.getElementById('stat-za').textContent = totalZA;
-    document.getElementById('stat-fautes').textContent = totalFautes;
+    // --- AJOUT/MODIFICATION : Gestion de l'astérisque si une case est cochée ---
+    if (btnAjustTable.checked || btnAjustPoche.checked) {
+        finalScoreSpan.textContent =  scoreFinal + '*';
+    } else {
+        finalScoreSpan.textContent = scoreFinal;
+    }
+
+    // --- Suite existante des statistiques ---
+    document.getElementById('stat-billes').textContent = totalBillesEmpochees; //
+    document.getElementById('stat-parfaites').textContent = totalManchesParfaites; //
+    document.getElementById('stat-za').textContent = totalZA; //
+    document.getElementById('stat-fautes').textContent = totalFautes; //
 
     // NOUVELLES TUILES DE SCORE
-    document.getElementById('stat-score-brut').textContent = scoreTotal;
-    document.getElementById('stat-score-net').textContent = scoreFinal;
-
+    document.getElementById('stat-score-brut').textContent = scoreTotal; //
+    document.getElementById('stat-score-net').textContent = scoreFinal; //
 }
+
 
 function genererOptionsSelecteur(manche) {
     const cache = gameEngine.domCache[manche];
