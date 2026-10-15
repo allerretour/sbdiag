@@ -228,7 +228,7 @@ function calculerScore() {
         scoreTotal += (scoreManche === '-') ? 0 : scoreManche;
     }
 
-    totalSpan.textContent = scoreTotal;
+    // totalSpan.textContent = scoreTotal;
 
     let totalMalus = 0;
     if (btnAjustTable.checked) totalMalus += CONFIG_SCORES.malusTable;

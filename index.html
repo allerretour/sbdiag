@@ -117,44 +117,28 @@
     cursor: pointer;
 }
 
-/* Nouveau : Conteneur des scores repoussé vers la gauche */
+/* Conteneur du score unique poussé vers la droite */
 .score-cards-container {
     display: flex;
-    align-items: flex-end;  /* Aligne le bas du badge brut avec le bas du grand chiffre */
-    gap: 20px;          /* Augmentation de l'espace entre le Brut et le Final */
-    margin-left: auto;   /* Pousse le point brut vers la gauche/le centre */
-    padding-right: 8px; /* Laisse le score final bien calé à droite */
+    justify-content: flex-end;
+    align-items: center;
+    margin-left: auto;   /* Pousse tout le bloc vers l'extrême droite */
+    padding-right: 4px;
 }
 
-/* Le Score Brut (Badge décalé vers la gauche et descendu) */
-.raw-score {
-    font-size: 10px;
-    font-weight: 500;
-    color: #64748b;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 6px 12px;
-    border-radius: 10px;
-    white-space: nowrap;
-    
-     
-}
-
-.raw-score span {
-    color: #94a3b8;
-    font-weight: 700;
-}
-
-
-/* Le Score Final (Reste l'ancre à l'extrême droite) */
+/* Le Score Final Net unique */
 .final-score-display {
-    font-size: 40px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 46px;         /* Grand format pour une visibilité instantanée */
     font-weight: 900; 
-    color: #2563eb; /* Bleu électrique */
+    color: #2563eb;          /* Bleu électrique */
     line-height: 1;
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
     white-space: nowrap;
 }
+
 
 /* --- RESPONSIVE MOBILE --- */
 @media (max-width: 520px) {
@@ -643,9 +627,11 @@
     
     <!-- Groupe les scores à droite sur une seule ligne -->
     <div class="score-cards-container">
-        <div class="raw-score">Points Bruts : <span id="total">0</span></div>
-        <div class="final-score-display"><span id="final-score">0</span><span style="font-size: 20px; color:var(--text-muted);"> pts</span></div>
+    <div class="final-score-display" title="Score final après ajustements">
+        <span id="final-score">0</span>
     </div>
+</div>
+
 </div>
 
 
