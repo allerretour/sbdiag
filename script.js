@@ -8,6 +8,13 @@ const CONFIG_SCORES = {
     multiplicateurMancheParfaite: 2 // Multiplicateur si toutes les billes sont rentrées
 };
 
+// Génère un ID unique pour cet onglet s'il n'existe pas déjà
+if (!sessionStorage.getItem('game_tab_id')) {
+    sessionStorage.setItem('game_tab_id', 'game_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
+}
+const LOCAL_STORAGE_KEY = sessionStorage.getItem('game_tab_id');
+
+
 const manchesList = document.getElementById('manches-list');
 const totalSpan = document.getElementById('total');
 const finalScoreSpan = document.getElementById('final-score');
@@ -95,11 +102,57 @@ function initialiserGrille(nbManches) {
 
 // Remplacer la boucle for (m=1..10) d'origine par cet écouteur et l'appel initial :
 selectManches.addEventListener('change', (e) => {
+    localStorage.removeItem(LOCAL_STORAGE_KEY); // Vide l'ancienne sauvegarde pour éviter les conflits de taille de grille
     initialiserGrille(parseInt(e.target.value));
 });
 
-// Lancement initial de la grille avec 10 manches par défaut
-initialiserGrille(10);
+function chargerPartieOuInitialiser() {
+    const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+    
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            
+            nbManchesActuel = data.nbManches;
+            selectManches.value = nbManchesActuel;
+            
+            btnAjustTable.checked = data.ajustTable;
+            btnAjustPoche.checked = data.ajustPoche;
+            
+            // 1. Reconstruire la grille visuelle vide
+            initialiserGrille(nbManchesActuel);
+            
+            // 2. Restaurer l'état complet de chaque manche
+            for (let m = 1; m <= nbManchesActuel; m++) {
+                const mancheSaved = data.manchesData[m];
+                if (mancheSaved) {
+                    // Restaure le score dans le moteur de jeu
+                    gameEngine.scoresState[m] = mancheSaved.scoreBrut;
+                    
+                    // Restaure l'état des cases à cocher dans le DOM
+                    const cache = gameEngine.domCache[m];
+                    cache.blanche.checked = mancheSaved.blanche;
+                    cache.za.checked = mancheSaved.za;
+                    
+                    if (mancheSaved.scoreBrut !== null) {
+                        cache.valBilles.textContent = mancheSaved.scoreBrut;
+                    }
+                }
+            }
+            
+            // 3. Recalculer pour appliquer les styles, les totaux et la logique métier
+            calculerScore();
+            return;
+        } catch (e) {
+            console.error("Erreur lors du chargement de la sauvegarde", e);
+        }
+    }
+    
+    initialiserGrille(10);
+}
+
+// Remplace l'ancien appel "initialiserGrille(10);"
+chargerPartieOuInitialiser();
 
 // --- GESTION DES CASES À COCHER D'AJUSTEMENT ---
 // Déclenche le calcul automatique dès qu'une case est cochée ou décochée
@@ -251,7 +304,27 @@ function calculerScore() {
     // NOUVELLES TUILES DE SCORE
     document.getElementById('stat-score-brut').textContent = scoreTotal; //
     document.getElementById('stat-score-net').textContent = scoreFinal; //
+
+        // === BLOC DE SAUVEGARDE MIS À JOUR ===
+    const manchesData = {};
+    for (let m = 1; m <= nbManchesActuel; m++) {
+        const cache = gameEngine.domCache[m];
+        manchesData[m] = {
+            scoreBrut: gameEngine.scoresState[m],
+            blanche: cache ? cache.blanche.checked : false,
+            za: cache ? cache.za.checked : false
+        };
+    }
+
+    const dataToSave = {
+        nbManches: nbManchesActuel,
+        manchesData: manchesData, // Sauvegarde les billes + les cases à cocher
+        ajustTable: btnAjustTable.checked,
+        ajustPoche: btnAjustPoche.checked
+    };
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
 }
+
 
 
 function genererOptionsSelecteur(manche) {
@@ -307,16 +380,18 @@ function reinitialiserPartie() {
         btnAjustTable.checked = false;
         btnAjustPoche.checked = false;
         
-        // Remplacer la boucle présente dans reinitialiserPartie par :
-	for (let m = 1; m <= nbManchesActuel; m++) {
-    		gameEngine.scoresState[m] = null;
-   		 const cache = gameEngine.domCache[m];
-    		cache.valBilles.textContent = '-'; // <--- AJOUT : Force l'affichage du tiret immédiatement
-    		cache.blanche.checked = false;
-   		 cache.za.checked = false;
-	}
+        for (let m = 1; m <= nbManchesActuel; m++) {
+            gameEngine.scoresState[m] = null;
+            const cache = gameEngine.domCache[m];
+            cache.valBilles.textContent = '-';
+            cache.blanche.checked = false;
+            cache.za.checked = false;
+        }
 
-        calculerScore(); // Re-génère les tirets et les styles d'origine
+        // AJOUT : Nettoie le localStorage pour cet onglet
+        localStorage.removeItem(LOCAL_STORAGE_KEY);
+
+        calculerScore(); 
     }
 }
 
