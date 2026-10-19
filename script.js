@@ -1,4 +1,12 @@
 // ==========================================
+// CONFIGURATION CONFIG SUPABASE
+// ==========================================
+const SUPABASE_URL = "https://bjwizitnhvcuvphdvvxx.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_hSQEsCXaQs7O7W-lNCgmwA_gKZ_m-T_";
+const SUPABASE_TABLE_NAME = "matchs"; // Le nom de votre table dans Supabase
+
+
+// ==========================================
 // CONFIGURATION DES SCORES ET CONFIG DU JEU
 // ==========================================
 const CONFIG_SCORES = {
@@ -405,11 +413,9 @@ document.addEventListener('click', (event) => {
 
 
 // --- GESTION DU BOUTON ENVOYER ---
-document.getElementById('btn-envoyer').addEventListener('click', () => {
+document.getElementById('btn-envoyer').addEventListener('click', async () => {
     // 1. Demander le nom
     let nom = prompt("Veuillez entrer votre Nom :");
-    
-    // Si l'utilisateur clique sur Annuler ou laisse vide
     if (nom === null) return; 
     nom = nom.trim();
     if (nom === "") {
@@ -419,8 +425,6 @@ document.getElementById('btn-envoyer').addEventListener('click', () => {
 
     // 2. Demander l'adresse courriel
     let courriel = prompt("Veuillez entrer votre Adresse courriel :");
-    
-    // Si l'utilisateur clique sur Annuler ou laisse vide
     if (courriel === null) return;
     courriel = courriel.trim();
     if (courriel === "") {
@@ -430,28 +434,77 @@ document.getElementById('btn-envoyer').addEventListener('click', () => {
 
     // 3. Demander le numéro de match (Code de 4 lettres)
     let numeroMatch = prompt("Veuillez entrer le code de match (4 lettres) :");
-    
-    // Si l'utilisateur clique sur Annuler ou laisse vide
     if (numeroMatch === null) return;
     numeroMatch = numeroMatch.trim();
     
-    // VALIDATION PAR ENTIERS ET LONGUEUR (Évite le bug d'affichage de la Regex)
-    // On vérifie si la longueur est différente de 4 OU si la chaîne contient autre chose que des lettres
     const estValide = numeroMatch.length === 4 && [...numeroMatch.toLowerCase()].every(char => char >= 'a' && char <= 'z');
-    
     if (!estValide) {
         alert("Le code de match doit être composé d'exactement 4 lettres.");
         return;
     }
-
-    // Optionnel : Convertir le code en majuscules pour uniformiser l'affichage
     numeroMatch = numeroMatch.toUpperCase();
 
-    // 4. Récupération du score net actuel pour validation
+    // 4. Récupération des scores et des statistiques du DOM
     const scoreFinal = document.getElementById('final-score').textContent;
+    const scoreBrut = document.getElementById('stat-score-brut').textContent;
+    const billesEmpochees = document.getElementById('stat-billes').textContent;
+    const manchesParfaites = document.getElementById('stat-parfaites').textContent;
+    const zonesArrivee = document.getElementById('stat-za').textContent;
+    const fautes = document.getElementById('stat-fautes').textContent;
 
-    // Affichage de la confirmation du succès
-    alert(`Merci ${nom} !\nVos informations ont été enregistrées avec succès.\nMatch # : ${numeroMatch}\nCourriel : ${courriel}\nScore Net : ${scoreFinal}`);
-    
-    // TODO: Vous pouvez ajouter ici une requête Fetch/Ajax si vous devez envoyer ces données à un serveur.
+    // Préparation de l'objet de données à envoyer
+    const donnéesMatch = {
+        nom_joueur: nom,
+        courriel: courriel,
+        code_match: numeroMatch,
+        score_net: scoreFinal,
+        score_brut: parseInt(scoreBrut) || 0,
+        billes_empochees: parseInt(billesEmpochees) || 0,
+        manches_parfaites: parseInt(manchesParfaites) || 0,
+        zones_arrivee: parseInt(zonesArrivee) || 0,
+        fautes: parseInt(fautes) || 0,
+        ajust_table: btnAjustTable.checked,
+        ajust_poche: btnAjustPoche.checked,
+        nb_manches: nbManchesActuel
+    };
+
+    // 5. Envoi vers Supabase avec Fetch
+    try {
+        // Optionnel : Changer le texte du bouton pendant l'envoi
+        const btnEnvoyer = document.getElementById('btn-envoyer');
+        const texteDorigine = btnEnvoyer.textContent;
+        btnEnvoyer.textContent = "Envoi en cours...";
+        btnEnvoyer.disabled = true;
+
+        const urlSupabase = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE_NAME}`;
+
+        const reponse = await fetch(urlSupabase, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal' // Demande à Supabase de ne pas renvoyer toute la ligne créée (plus rapide)
+            },
+            body: JSON.stringify(donnéesMatch)
+        });
+
+        // Remettre le bouton à son état normal
+        btnEnvoyer.textContent = texteDorigine;
+        btnEnvoyer.disabled = false;
+
+        if (reponse.ok) {
+            alert(`Merci ${nom} !\nVos statistiques ont été envoyées avec succès vers Supabase.\nMatch # : ${numeroMatch}\nScore Net : ${scoreFinal}`);
+        } else {
+            const erreurTexte = await reponse.text();
+            throw new Error(erreurTexte);
+        }
+
+    } catch (erreur) {
+        console.error("Erreur Supabase :", erreur);
+        alert("Impossible d'envoyer les données vers Supabase. Vérifiez votre connexion ou vos configurations de table.");
+        
+        // Assure que le bouton redevient cliquable en cas d'erreur
+        document.getElementById('btn-envoyer').disabled = false;
+    }
 });
