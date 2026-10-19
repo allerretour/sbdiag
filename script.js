@@ -402,3 +402,38 @@ document.addEventListener('click', (event) => {
         });
     }
 });
+
+
+// --- GESTION DU BOUTON ENVOYER ---
+document.getElementById('btn-envoyer').addEventListener('click', () => {
+    // 1. Demander le nom
+    let nom = prompt("Veuillez entrer votre Nom :");
+    
+    // Si l'utilisateur clique sur Annuler ou laisse vide
+    if (nom === null) return; 
+    nom = nom.trim();
+    if (nom === "") {
+        alert("Le nom est obligatoire pour continuer.");
+        return;
+    }
+
+    // 2. Demander l'adresse courriel
+    let courriel = prompt("Veuillez entrer votre Adresse courriel :");
+    
+    // Si l'utilisateur clique sur Annuler ou laisse vide
+    if (courriel === null) return;
+    courriel = courriel.trim();
+    if (courriel === "") {
+        alert("L'adresse courriel est obligatoire pour continuer.");
+        return;
+    }
+
+    // 3. Récupération du score net actuel pour validation (optionnel)
+    const scoreFinal = document.getElementById('final-score').textContent;
+
+    // Affichage de la confirmation du succès
+    alert(`Merci ${nom} !\nVos informations ont été enregistrées avec succès.\nCourriel : ${courriel}\nScore Net : ${scoreFinal}`);
+    
+    // TODO: Vous pouvez ajouter ici une requête Fetch/Ajax si vous devez envoyer ces données à un serveur.
+});
+
