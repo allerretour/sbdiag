@@ -428,12 +428,30 @@ document.getElementById('btn-envoyer').addEventListener('click', () => {
         return;
     }
 
-    // 3. Récupération du score net actuel pour validation (optionnel)
+    // 3. Demander le numéro de match (Code de 4 lettres)
+    let numeroMatch = prompt("Veuillez entrer le code de match (4 lettres) :");
+    
+    // Si l'utilisateur clique sur Annuler ou laisse vide
+    if (numeroMatch === null) return;
+    numeroMatch = numeroMatch.trim();
+    
+    // VALIDATION PAR ENTIERS ET LONGUEUR (Évite le bug d'affichage de la Regex)
+    // On vérifie si la longueur est différente de 4 OU si la chaîne contient autre chose que des lettres
+    const estValide = numeroMatch.length === 4 && [...numeroMatch.toLowerCase()].every(char => char >= 'a' && char <= 'z');
+    
+    if (!estValide) {
+        alert("Le code de match doit être composé d'exactement 4 lettres.");
+        return;
+    }
+
+    // Optionnel : Convertir le code en majuscules pour uniformiser l'affichage
+    numeroMatch = numeroMatch.toUpperCase();
+
+    // 4. Récupération du score net actuel pour validation
     const scoreFinal = document.getElementById('final-score').textContent;
 
     // Affichage de la confirmation du succès
-    alert(`Merci ${nom} !\nVos informations ont été enregistrées avec succès.\nCourriel : ${courriel}\nScore Net : ${scoreFinal}`);
+    alert(`Merci ${nom} !\nVos informations ont été enregistrées avec succès.\nMatch # : ${numeroMatch}\nCourriel : ${courriel}\nScore Net : ${scoreFinal}`);
     
     // TODO: Vous pouvez ajouter ici une requête Fetch/Ajax si vous devez envoyer ces données à un serveur.
 });
-
