@@ -440,15 +440,15 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
     z-index: 50;
     padding: 10px;
-    min-width: 140px;
+    min-width: 170px; /* MODIFIÉ : Augmenté de 140px à 170px pour accueillir les plus gros boutons */
 }
 
 /* Grille des chiffres dans le sélecteur */
 .selecteur-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Ajustez le nombre de colonnes selon vos besoins */
-    gap: 6px;
-    margin-bottom: 8px;
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 8px; /* MODIFIÉ : Espacement légèrement plus grand pour aérer */
+    margin-bottom: 10px; /* MODIFIÉ : Un peu plus d'espace avant le bouton fermer */
 }
 
 /* Bouton individuel de chiffre */
@@ -456,16 +456,16 @@
     background: #334155;
     color: #f8fafc;
     border: none;
-    padding: 8px;
+    padding: 12px 8px; /* MODIFIÉ : Augmenté de 8px à 12px en haut/bas pour plus de hauteur (zone de clic) */
     border-radius: 6px;
     font-weight: bold;
+    font-size: 16px; /* AJOUTÉ : Taille du texte agrandie pour une meilleure lisibilité */
     cursor: pointer;
+    transition: transform 0.1s ease, background 0.1s ease; /* AJOUTÉ : Pour une interaction plus fluide */
 }
 .btn-select-val:hover {
     background: #475569;
 }
-
-
 
 /* Bouton pour fermer le popover sans changer le score */
 .btn-close-selecteur {
@@ -473,22 +473,25 @@
     background: transparent;
     color: #94a3b8;
     border: 1px dashed #475569;
-    padding: 4px;
-    border-radius: 4px;
-    font-size: 11px;
+    padding: 8px; /* MODIFIÉ : Augmenté de 4px à 8px pour être plus facile à cibler */
+    border-radius: 6px; /* MODIFIÉ : Arrondi harmonisé avec les autres boutons */
+    font-size: 13px; /* MODIFIÉ : Augmenté de 11px à 13px */
+    font-weight: 500; /* AJOUTÉ : Un peu plus visible */
     cursor: pointer;
 }
 .btn-close-selecteur:hover {
     color: #f1f5f9;
     background: rgba(255,255,255,0.05);
 }
+
 /* Style pour le chiffre actuellement sélectionné dans le sélecteur */
 .btn-select-val.is-active {
     background-color: var(--accent-blue, #3b82f6) !important;
     color: #ffffff;
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
-    transform: scale(1.05);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); /* OPTIMISÉ : Ombre alignée sur la couleur bleue de l'accent */
+    transform: scale(1.08); /* MODIFIÉ : Effet de loupe légèrement plus prononcé (1.05 à 1.08) */
 }
+
 
 
 
@@ -656,7 +659,16 @@
     <h3 class="stats-title">Statistiques du match</h3>
     <div class="stats-grid">
 
-<div class="stat-card">
+
+	<div class="stat-card">
+    <span class="stat-icon">🏆</span>
+    <div class="stat-info">
+    <span class="stat-label">Score Net</span>
+    <span class="stat-value" id="stat-score-net">0</span>
+</div>
+</div>
+	
+	<div class="stat-card">
     <span class="stat-icon">📊</span>
     <div class="stat-info">
     <span class="stat-label">Score Brut</span>
@@ -665,12 +677,20 @@
 </div>
 
 <div class="stat-card">
-    <span class="stat-icon">🏆</span>
-    <div class="stat-info">
-    <span class="stat-label">Score Net</span>
-    <span class="stat-value" id="stat-score-net">0</span>
-</div>
-</div>
+            <span class="stat-icon">🎯</span>
+            <div class="stat-info">
+                <span class="stat-label">Zones d'arrivé</span>
+                <span class="stat-value" id="stat-za">0</span>
+            </div>
+        </div>
+
+<div class="stat-card">
+            <span class="stat-icon">⭐</span>
+            <div class="stat-info">
+                <span class="stat-label">Manches parfaites</span>
+                <span class="stat-value" id="stat-parfaites">0</span>
+            </div>
+        </div>
 
 
         <div class="stat-card">
@@ -681,20 +701,10 @@
             </div>
         </div>
 
-        <div class="stat-card">
-            <span class="stat-icon">⭐</span>
-            <div class="stat-info">
-                <span class="stat-label">Manches parfaites</span>
-                <span class="stat-value" id="stat-parfaites">0</span>
-            </div>
-        </div>
-        <div class="stat-card">
-            <span class="stat-icon">🎯</span>
-            <div class="stat-info">
-                <span class="stat-label">Zones d'arrivé</span>
-                <span class="stat-value" id="stat-za">0</span>
-            </div>
-        </div>
+        
+		
+        
+		
         <div class="stat-card stat-card-foul">
             <span class="stat-icon">⚠️</span>
             <div class="stat-info">
@@ -702,6 +712,7 @@
                 <span class="stat-value" id="stat-fautes">0</span>
             </div>
         </div>
+		
     </div>
 </div>
 
