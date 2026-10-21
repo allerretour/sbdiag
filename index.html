@@ -3,32 +3,919 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classement des Matchs</title>
-    <link rel="stylesheet" href="style.css">
-    </head>
+    <title>Carte de pointage</title>
+    <style>
+        :root {
+            --bg-dark: #121824;
+            --card-bg: #1e2640;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --accent-gold: #f59e0b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #161f33;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+		
+		
+	.header-title-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1 1 50px;
+}
+
+.nb-manches-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.nb-manches-selector select {
+    background-color: #0f172a;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+}
+
+.nb-manches-selector select:focus {
+    border-color: #2563eb; /* Rappel du bleu électrique choisi */
+}
+
+/* Entête "Entre-deux" : Alignements optimisés */
+.header-score {
+    display: flex;
+    justify-content: space-between;
+    /* CHANGEMENT ICI : Aligne TOUT le contenu vers le haut */
+    align-items: flex-start; 
+    gap: 14px;
+    
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    /* Réduction du padding du haut pour gagner encore plus d'espace */
+    padding: 10px 20px 14px 20px; 
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Bloc Gauche : Titre et Sélecteur */
+.header-title-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.header-score h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.3px;
+}
+
+.nb-manches-selector {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.nb-manches-selector select {
+    background-color: #0f172a;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 1px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Conteneur du score unique poussé vers la droite */
+.score-cards-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-left: auto;   /* Pousse tout le bloc vers l'extrême droite */
+    padding-right: 4px;
+}
+
+/* Le Score Final Net unique */
+.final-score-display {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 46px;         /* Grand format pour une visibilité instantanée */
+    font-weight: 900; 
+    color: #2563eb;          /* Bleu électrique */
+    line-height: 1;
+    letter-spacing: -1px;
+    white-space: nowrap;
+}
+
+
+/* --- RESPONSIVE MOBILE --- */
+@media (max-width: 520px) {
+    
+    body {
+        padding: 10px; /* Réduit l'espace autour de l'application */
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 8px; /* Réduit l'espace sous le titre principal */
+    }
+
+    header {
+        margin-bottom: 12px; /* Réduit l'espace entre le bloc titre/sélecteur et le score */
+    }
+
+    .setup-bar {
+        padding: 8px 12px; /* Rend la barre de sélection plus compacte */
+    }
+
+    .header-score {
+        flex-direction: column;
+        text-align: center;
+        padding: 16px;
+        gap: 12px;
+    }
+    
+    .header-title-container {
+        align-items: center;
+    }
+    
+    .score-cards-container {
+        width: 100%;
+        justify-content: center;
+        align-items: center; /* Recentre verticalement les deux éléments sur mobile */
+        margin-left: 0;
+        padding-right: 0;
+        gap: 16px;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+        /* Liste des Manches */
+        .manches-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .manche-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 4px 16px;
+            display: grid;
+            grid-template-columns: 1.2fr 1.5fr 1fr 1fr 0.8fr;
+            align-items: center;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .manche-info {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .manche-info span {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        /* Boutons de contrôle tactiles */
+        .counter-group {
+            display: flex;
+            align-items: center;
+            background: #13192b;
+            border-radius: 8px;
+            padding: 3px;
+            justify-content: space-between;
+        }
+
+        .btn-touch {
+            background: #2e3757;
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-touch:active {
+            background: var(--accent-blue);
+        }
+
+        .billes-val {
+            font-size: 16px;
+            font-weight: 700;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Checkboxes stylisées en boutons d'action */
+        .input-cell {
+            display: flex;
+            justify-content: center;
+        }
+
+        .cb-touch-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+
+        .cb-touch-label input {
+            display: none;
+        }
+
+        /* Style Bouton Foul (Blanche) */
+        .cb-foul {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        .cb-foul::before { content: "F"; }
+        .cb-foul:has(input:checked) {
+            background: var(--accent-red);
+            color: white;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Style Bouton ZA (Zone d'Arrivée) */
+        .cb-za {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent-gold);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+        .cb-za::before { content: "ZA"; }
+        .cb-za:has(input:checked) {
+            background: var(--accent-gold);
+            color: #000;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Colonne Score Final par Manche */
+        .score-manche {
+            text-align: right;
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        
+		
+		/* --- TRANSITIONS GLOBALES DES CARTES --- */
+.manche-card {
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* --- ETATS ET COULEURS DE FOND DES CARTES --- */
+
+/* Style si la ligne est FOUL (Accent rouge subtil) */
+.manche-card.manche-foul {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+/* Style si la ligne est PARFAITE ou avec ZA (Accent vert subtil pour les deux) */
+.manche-card.manche-parfaite,
+.manche-card.manche-za {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Style si la ligne contient des points normaux (Accent jaune/orange subtil) */
+.manche-card.manche-encours {
+    background-color: rgba(245, 158, 11, 0.1) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+
+/* --- COULEURS DYNAMIQUES POUR LE TEXTE DU POINTAGE --- */
+
+/* Par défaut : Gris pâle pour le pointage à 0 (classe .manche-zero ou sans état) */
+.score-manche {
+    text-align: right;
+    font-size: 30px;
+    font-weight: 700;
+    color: #94a3b8; 
+    transition: color 0.3s ease;
+}
+
+/* Entre 0 et max (Ex: 3 billes sur la manche 5) : Blanc */
+.manche-encours .score-manche {
+    color: var(--text-main) !important; /* Blanc */
+}
+
+/* Quand Pointage Maximum atteint seul : Vert */
+.manche-parfaite .score-manche {
+    color: var(--accent-green) !important; /* Vert */
+}
+
+/* Quand ZA activé : Jaune / Or (La carte reste verte grâce au sélecteur groupé plus haut) */
+.manche-za .score-manche {
+    color: var(--accent-gold) !important; /* Jaune / Or */
+}
+
+/* Quand Faute (Blanche empochée) : Rouge */
+.manche-foul .score-manche {
+    color: var(--accent-red) !important; /* Rouge */
+}
+
+		
+		
+	/* Style du chiffre central transformé en bouton cliquable */
+/* Réduction de la largeur de la case/bouton du nombre de billes */
+.main-trigger {
+    cursor: pointer;
+    width: 42px;           /* Largeur fixe étroite */
+    height: 42px;          /* Hauteur identique pour créer un bouton carré parfait */
+    display: flex;
+    align-items: center;   /* Centre le chiffre verticalement */
+    justify-content: center;/* Centre le chiffre horizontalement */
+    background: #1e293b;
+    border: 2px solid #334155;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.1rem;     /* Taille du chiffre bien lisible */
+    transition: background 0.2s, border-color 0.2s;
+    user-select: none;
+    box-sizing: border-box; /* Intègre la bordure dans le calcul des 42px */
+	margin-left: 30px; /* Ajustez cette valeur (ex: 15px, 25px) pour déplacer plus ou moins la case */
+}
+
+/* Conserve le changement de couleur au survol */
+.main-trigger:hover {
+    background: #334155;
+    border-color: var(--accent-blue, #3b82f6);
+}
+
+
+/* Positionnement de l'enveloppe */
+.counter-group-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* Conteneur du mini-sélecteur de points */
+.mini-selecteur {
+    position: absolute;
+    top: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    border: 1px solid #475569;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    z-index: 50;
+    padding: 10px;
+    min-width: 170px; /* MODIFIÉ : Augmenté de 140px à 170px pour accueillir les plus gros boutons */
+}
+
+/* Grille des chiffres dans le sélecteur */
+.selecteur-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 8px; /* MODIFIÉ : Espacement légèrement plus grand pour aérer */
+    margin-bottom: 10px; /* MODIFIÉ : Un peu plus d'espace avant le bouton fermer */
+}
+
+/* Bouton individuel de chiffre */
+.btn-select-val {
+    background: #334155;
+    color: #f8fafc;
+    border: none;
+    padding: 12px 8px; /* MODIFIÉ : Augmenté de 8px à 12px en haut/bas pour plus de hauteur (zone de clic) */
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 16px; /* AJOUTÉ : Taille du texte agrandie pour une meilleure lisibilité */
+    cursor: pointer;
+    transition: transform 0.1s ease, background 0.1s ease; /* AJOUTÉ : Pour une interaction plus fluide */
+}
+.btn-select-val:hover {
+    background: #475569;
+}
+
+/* Bouton pour fermer le popover sans changer le score */
+.btn-close-selecteur {
+    width: 100%;
+    background: transparent;
+    color: #94a3b8;
+    border: 1px dashed #475569;
+    padding: 8px; /* MODIFIÉ : Augmenté de 4px à 8px pour être plus facile à cibler */
+    border-radius: 6px; /* MODIFIÉ : Arrondi harmonisé avec les autres boutons */
+    font-size: 13px; /* MODIFIÉ : Augmenté de 11px à 13px */
+    font-weight: 500; /* AJOUTÉ : Un peu plus visible */
+    cursor: pointer;
+}
+.btn-close-selecteur:hover {
+    color: #f1f5f9;
+    background: rgba(255,255,255,0.05);
+}
+
+/* Style pour le chiffre actuellement sélectionné dans le sélecteur */
+.btn-select-val.is-active {
+    background-color: var(--accent-blue, #3b82f6) !important;
+    color: #ffffff;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); /* OPTIMISÉ : Ombre alignée sur la couleur bleue de l'accent */
+    transform: scale(1.08); /* MODIFIÉ : Effet de loupe légèrement plus prononcé (1.05 à 1.08) */
+}
+
+
+
+
+/* Conteneur principal de la ligne du bas */
+.footer-controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Espace le sélecteur à gauche et les options à droite */
+    gap: 16px;
+    padding: 12px 16px;
+    background-color: #1e293b;       /* Fond sombre pour délimiter le menu du bas */
+    border-top: 1px solid #334155;
+    margin-top: 20px;
+    border-radius: 8px;              /* Optionnel : à retirer si vous voulez qu'il colle aux bords de l'écran */
+}
+
+/* Style compact pour le choix des manches */
+.select-manches-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #f8fafc;
+}
+
+.select-manches-wrapper select {
+    padding: 4px 8px;
+    background-color: #0f172a;
+    color: white;
+    border: 1px solid #475569;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+
+
+.stats-container {
+    margin-top: 10px;
+	margin-bottom: 10px;
+    padding: 20px;
+    background: #1e293b; /* Fond sombre assorti à votre bouton Max actuel */
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.stats-title {
+    color: #f8fafc;
+    font-size: 1.1rem;
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+}
+
+.stat-card {
+    background: #334155;
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 4px solid #3b82f6; /* Bordure bleue par défaut */
+}
+
+.stat-card-foul {
+    border-left-color: #ef4444; /* Bordure rouge pour les fautes */
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    color: #94a3b8;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.stat-value {
+    color: #ffffff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+
+
+
+/* ==========================================================================
+   BARRE DE CONFIGURATION ET FOOTER (DESIGN MODERNE ET RESPONSIVE)
+   ========================================================================== */
+
+/* Conteneur principal englobant tout le bas */
+.match-footer-controls {
+    margin-top: 25px;
+    padding: 16px;
+    background-color: var(--card-bg); /* Utilise la variable existante #1e2640 */
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Barre supérieure regroupant les paramètres techniques */
+.match-config-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Séparateur discret */
+}
+
+/* Alignement interne des différents modules */
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Sélecteur de manches alternatif du bas */
+.select-manches-wrapper label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.select-manches-wrapper .select-field {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.select-manches-wrapper .select-field:focus {
+    border-color: var(--accent-blue);
+}
+
+/* Cases à cocher des options de table d'ajustement */
+.ajustement-container {
+    gap: 16px;
+}
+
+.ajust-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.ajust-label:hover {
+    color: var(--text-main);
+}
+
+.ajust-label input[type="checkbox"] {
+    accent-color: var(--accent-blue); /* Applique la nuance bleue de votre thème */
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+/* Version optimisée et compacte du bouton Réinitialiser de la barre */
+.btn-reset {
+    width: auto; /* Évite de prendre 100% de la largeur dans la barre */
+    background: #27314f;
+    color: var(--text-main);
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-reset:hover {
+    background: #334166;
+}
+
+.btn-reset:active {
+    transform: scale(0.98);
+}
+
+/* Conteneur inférieur pour l'action principale */
+.send-container {
+    display: flex;
+    justify-content: center;
+    padding-top: 16px;
+}
+
+/* Bouton ENVOYER premium */
+.btn-primary-send {
+    background-color: var(--accent-green);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 320px;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+.btn-primary-send:hover {
+    background-color: #059669; /* Vert légèrement plus soutenu au survol */
+    box-shadow: 0 6px 14px rgba(16, 185, 129, 0.3);
+}
+
+.btn-primary-send:active {
+    transform: scale(0.98);
+}
+
+/* --- ADAPTATION RESPONSIVE MOBILE (< 520px) --- */
+@media (max-width: 520px) {
+    .match-config-bar {
+        flex-direction: column;
+        align-items: stretch; /* Force les éléments à occuper la largeur */
+        gap: 12px;
+    }
+
+    .select-manches-wrapper {
+        justify-content: space-between;
+    }
+
+    .ajustement-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 4px 0;
+    }
+
+    .btn-reset {
+        width: 100%; /* Devient plein écran uniquement sur mobile pour rester tactile */
+        padding: 10px;
+        font-size: 13px;
+        text-align: center;
+    }
+
+    .btn-primary-send {
+        max-width: 100%; /* Prend toute la largeur disponible sur petit écran */
+    }
+}
+
+
+
+		
+		
+    </style>
+</head>
 <body>
 
-
-
-<div class="container">
-    <h1>🏆 Tableau des Classements</h1>
-
-<!-- Filtre de match à placer tout en haut -->
-<div class="filtre-container">
-    <label for="filtre-match">🔍 Filtrer par match :</label>
-    <select id="filtre-match">
-        <option value="tous">🏆 Tous les matchs</option>
-    </select>
-</div>
-
-
-    <div id="classement-container">
-        <div class="loading">Chargement des scores depuis la base de donnée...</div>
+ <div class="container">
+        <div class="header-score">
+    <div class="header-title-container">
+        <h1>Carte de pointage</h1>
+        
+    </div>
+    
+    <!-- Groupe les scores à droite sur une seule ligne -->
+    <div class="score-cards-container">
+    <div class="final-score-display" title="Score final après ajustements">
+        <span id="final-score">0</span>
     </div>
 </div>
 
-<script src="script.js" defer></script>
+</div>
 
+
+
+
+
+        <!-- Grille des Manches (générée par script.js) -->
+        <div class="manches-container" id="manches-list"></div>
+
+       
+
+		
+		
+
+       
+
+
+<div class="stats-container">
+    <h3 class="stats-title">Statistiques du match</h3>
+    <div class="stats-grid">
+
+
+	<div class="stat-card">
+    <span class="stat-icon">🏆</span>
+    <div class="stat-info">
+    <span class="stat-label">Score Net</span>
+    <span class="stat-value" id="stat-score-net">0</span>
+</div>
+</div>
+	
+	<div class="stat-card">
+    <span class="stat-icon">📊</span>
+    <div class="stat-info">
+    <span class="stat-label">Score Brut</span>
+    <span class="stat-value" id="stat-score-brut">0</span>
+</div>
+</div>
+
+<div class="stat-card">
+            <span class="stat-icon">🎯</span>
+            <div class="stat-info">
+                <span class="stat-label">Zones d'arrivé</span>
+                <span class="stat-value" id="stat-za">0</span>
+            </div>
+        </div>
+
+<div class="stat-card">
+            <span class="stat-icon">⭐</span>
+            <div class="stat-info">
+                <span class="stat-label">Manches parfaites</span>
+                <span class="stat-value" id="stat-parfaites">0</span>
+            </div>
+        </div>
+
+
+        <div class="stat-card">
+            <span class="stat-icon">⚪</span>
+            <div class="stat-info">
+                <span class="stat-label">Billes empochées</span>
+                <span class="stat-value" id="stat-billes">0</span>
+            </div>
+        </div>
+
+        
+		
+        
+		
+        <div class="stat-card stat-card-foul">
+            <span class="stat-icon">⚠️</span>
+            <div class="stat-info">
+                <span class="stat-label">Fautes (Blanche)</span>
+                <span class="stat-value" id="stat-fautes">0</span>
+            </div>
+        </div>
+		
+    </div>
+</div>
+
+<!-- ==========================================
+     BARRE DE CONFIGURATION ET ACTIONS DU MATCH
+     (À placer juste après la grille des manches)
+     ========================================== -->
+<div class="match-footer-controls">
+    
+    <!-- Ligne supérieure : Configuration technique du match -->
+    <div class="match-config-bar">
+        <!-- Choix du nombre de manches -->
+        <div class="control-group select-manches-wrapper">
+            <label for="select-manches">Manches :</label>
+            <select id="select-manches" class="select-field">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10" selected>10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+            </select>
+        </div>
+
+        <!-- Options d'ajustement du terrain -->
+        <div class="control-group ajustement-container">
+            <label class="ajust-label">
+                <input type="checkbox" id="btn-ajust-table"> <span>*Table hors standard</span>
+            </label>
+            <label class="ajust-label">
+                <input type="checkbox" id="btn-ajust-poche"> <span>*Poches hors standard</span>
+            </label>
+        </div>
+
+        <!-- Action secondaire : Réinitialisation rapide -->
+        <div class="control-group reset-wrapper">
+            <button class="btn-reset" onclick="reinitialiserPartie()" title="Remettre le match à zéro">
+                Réinitialiser le match
+            </button>
+        </div>
+    </div>
+
+    <!-- Ligne inférieure : Action principale d'envoi final -->
+    <div class="send-container">
+        <button id="btn-envoyer" class="btn-primary-send">
+            ENVOYER LES RÉSULTATS
+        </button>
+    </div>
+
+</div>
+
+
+
+
+		
+</div>
+	
+	
+
+
+    <!-- Liaison avec le fichier script.js -->
+    <script src="script.js"></script>
 </body>
 </html>
-
