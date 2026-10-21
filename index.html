@@ -757,165 +757,147 @@
 </head>
 <body>
 
- <div class="container">
-        <div class="header-score">
-    <div class="header-title-container">
-        <h1>Carte de pointage</h1>
+    <div class="container">
         
-    </div>
-    
-    <!-- Groupe les scores à droite sur une seule ligne -->
-    <div class="score-cards-container">
-    <div class="final-score-display" title="Score final après ajustements">
-        <span id="final-score">0</span>
-    </div>
-</div>
+        <!-- ==========================================
+             ENTÊTE : TITRE ET SCORE GÉNÉRAL
+             ========================================== -->
+        <div class="header-score">
+            <div class="header-title-container">
+                <h1>Carte de pointage</h1>
+            </div>
+            
+            <div class="score-cards-container">
+                <div class="final-score-display" title="Score final après ajustements">
+                    <span id="final-score">0</span>
+                </div>
+            </div>
+        </div>
 
-</div>
-
-
-
-
-
-        <!-- Grille des Manches (générée par script.js) -->
+        <!-- ==========================================
+             GRILLE DES MANCHES
+             (Générée dynamiquement par script.js)
+             ========================================== -->
         <div class="manches-container" id="manches-list"></div>
 
-       
+        <!-- ==========================================
+             PANNEAU DES STATISTIQUES DU MATCH
+             ========================================== -->
+        <div class="stats-container">
+            <h3 class="stats-title">Statistiques du match</h3>
+            <div class="stats-grid">
 
-		
-		
+                <div class="stat-card">
+                    <span class="stat-icon">🏆</span>
+                    <div class="stat-info">
+                        <span class="stat-label">Score Net</span>
+                        <span class="stat-value" id="stat-score-net">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <span class="stat-icon">📊</span>
+                    <div class="stat-info">
+                        <span class="stat-label">Score Brut</span>
+                        <span class="stat-value" id="stat-score-brut">0</span>
+                    </div>
+                </div>
 
-       
+                <div class="stat-card">
+                    <span class="stat-icon">🎯</span>
+                    <div class="stat-info">
+                        <span class="stat-label">Zones d'arrivée</span>
+                        <span class="stat-value" id="stat-za">0</span>
+                    </div>
+                </div>
 
+                <div class="stat-card">
+                    <span class="stat-icon">⭐</span>
+                    <div class="stat-info">
+                        <span class="stat-label">Manches parfaites</span>
+                        <span class="stat-value" id="stat-parfaites">0</span>
+                    </div>
+                </div>
 
-<div class="stats-container">
-    <h3 class="stats-title">Statistiques du match</h3>
-    <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-icon">⚪</span>
+                    <div class="stat-info">
+                        <span class="stat-label">Billes empochées</span>
+                        <span class="stat-value" id="stat-billes">0</span>
+                    </div>
+                </div>
 
-
-	<div class="stat-card">
-    <span class="stat-icon">🏆</span>
-    <div class="stat-info">
-    <span class="stat-label">Score Net</span>
-    <span class="stat-value" id="stat-score-net">0</span>
-</div>
-</div>
-	
-	<div class="stat-card">
-    <span class="stat-icon">📊</span>
-    <div class="stat-info">
-    <span class="stat-label">Score Brut</span>
-    <span class="stat-value" id="stat-score-brut">0</span>
-</div>
-</div>
-
-<div class="stat-card">
-            <span class="stat-icon">🎯</span>
-            <div class="stat-info">
-                <span class="stat-label">Zones d'arrivé</span>
-                <span class="stat-value" id="stat-za">0</span>
+                <div class="stat-card stat-card-foul">
+                    <span class="stat-icon">⚠️</span>
+                    <div class="stat-info">
+                        <span class="stat-label">Fautes (Blanche)</span>
+                        <span class="stat-value" id="stat-fautes">0</span>
+                    </div>
+                </div>
+                
             </div>
         </div>
 
-<div class="stat-card">
-            <span class="stat-icon">⭐</span>
-            <div class="stat-info">
-                <span class="stat-label">Manches parfaites</span>
-                <span class="stat-value" id="stat-parfaites">0</span>
+        <!-- ==========================================
+             BARRE DE CONFIGURATION ET ACTIONS DU MATCH
+             ========================================== -->
+        <div class="match-footer-controls">
+            
+            <!-- Configuration technique (Manches, Ajustements, Reset) -->
+            <div class="match-config-bar">
+                
+                <!-- Choix du nombre de manches -->
+                <div class="control-group select-manches-wrapper">
+                    <label for="select-manches">Manches :</label>
+                    <select id="select-manches" class="select-field">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10" selected>10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                    </select>
+                </div>
+
+                <!-- Options d'ajustement du terrain -->
+                <div class="control-group ajustement-container">
+                    <label class="ajust-label">
+                        <input type="checkbox" id="btn-ajust-table"> <span>*Table hors standard</span>
+                    </label>
+                    <label class="ajust-label">
+                        <input type="checkbox" id="btn-ajust-poche"> <span>*Poches hors standard</span>
+                    </label>
+                </div>
+
+                <!-- Action de réinitialisation -->
+                <div class="control-group reset-wrapper">
+                    <button class="btn-reset" onclick="reinitialiserPartie()" title="Remettre le match à zéro">
+                        Réinitialiser le match
+                    </button>
+                </div>
             </div>
-        </div>
 
-
-        <div class="stat-card">
-            <span class="stat-icon">⚪</span>
-            <div class="stat-info">
-                <span class="stat-label">Billes empochées</span>
-                <span class="stat-value" id="stat-billes">0</span>
+            <!-- Action principale d'envoi final -->
+            <div class="send-container">
+                <button id="btn-envoyer" class="btn-primary-send">
+                    ENVOYER LES RÉSULTATS
+                </button>
             </div>
+
         </div>
 
-        
-		
-        
-		
-        <div class="stat-card stat-card-foul">
-            <span class="stat-icon">⚠️</span>
-            <div class="stat-info">
-                <span class="stat-label">Fautes (Blanche)</span>
-                <span class="stat-value" id="stat-fautes">0</span>
-            </div>
-        </div>
-		
-    </div>
-</div>
+    </div> <!-- Fin du conteneur principal -->
 
-<!-- ==========================================
-     BARRE DE CONFIGURATION ET ACTIONS DU MATCH
-     (À placer juste après la grille des manches)
-     ========================================== -->
-<div class="match-footer-controls">
-    
-    <!-- Ligne supérieure : Configuration technique du match -->
-    <div class="match-config-bar">
-        <!-- Choix du nombre de manches -->
-        <div class="control-group select-manches-wrapper">
-            <label for="select-manches">Manches :</label>
-            <select id="select-manches" class="select-field">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10" selected>10</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
-                <option value="13">13</option>
-                <option value="14">14</option>
-                <option value="15">15</option>
-            </select>
-        </div>
-
-        <!-- Options d'ajustement du terrain -->
-        <div class="control-group ajustement-container">
-            <label class="ajust-label">
-                <input type="checkbox" id="btn-ajust-table"> <span>*Table hors standard</span>
-            </label>
-            <label class="ajust-label">
-                <input type="checkbox" id="btn-ajust-poche"> <span>*Poches hors standard</span>
-            </label>
-        </div>
-
-        <!-- Action secondaire : Réinitialisation rapide -->
-        <div class="control-group reset-wrapper">
-            <button class="btn-reset" onclick="reinitialiserPartie()" title="Remettre le match à zéro">
-                Réinitialiser le match
-            </button>
-        </div>
-    </div>
-
-    <!-- Ligne inférieure : Action principale d'envoi final -->
-    <div class="send-container">
-        <button id="btn-envoyer" class="btn-primary-send">
-            ENVOYER LES RÉSULTATS
-        </button>
-    </div>
-
-</div>
-
-
-
-
-		
-</div>
-	
-	
-
-
-    <!-- Liaison avec le fichier script.js -->
+    <!-- Liaison avec le fichier de scripts -->
     <script src="script.js"></script>
 </body>
 </html>
