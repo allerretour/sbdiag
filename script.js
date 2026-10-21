@@ -60,7 +60,7 @@
         }
     };
 
-        // --- FONCTION DE GÉNÉRATION DES TUILES DIRECTEMENT SOUS LA LIGNE ---
+     // --- FONCTION DE GÉNÉRATION DES TUILES DIRECTEMENT SOUS LA LIGNE ---
     window.afficherDetailsJoueur = function(idUniqueRow, indexGlobal) {
         const item = donneesGlobalesMatchs[indexGlobal];
         if (!item) return;
@@ -82,23 +82,22 @@
 
         // Étape 3 : Configuration de vos champs mis à jour
         const configChamps = [
-            
             { cle: 'score_net', label: 'Score Net', icone: '🎯', vedette: true },
             { cle: 'score_brut', label: 'Score Brut', icone: '📊' },
-			{ cle: 'zones_arrivee', label: 'Zones Arrivée', icone: '🏁' },
-			{ cle: 'manches_parfaites', label: 'Manches Parfaites', icone: '⭐' },
+            { cle: 'zones_arrivee', label: 'Zones Arrivée', icone: '🏁' },
+            { cle: 'manches_parfaites', label: 'Manches Parfaites', icone: '⭐' },
             { cle: 'billes_empochees', label: 'Billes Empochées', icone: '🎱' },
-            
-            
             { cle: 'fautes', label: 'Fautes', icone: '⚠️' },
             { cle: 'ajust_table', label: 'Ajust. Table', icone: '🔧', booleen: true },
             { cle: 'ajust_poche', label: 'Ajust. Poche', icone: '📐', booleen: true },
-			{ cle: 'nb_manches', label: 'Nb Manches', icone: '🔄' }
+            { cle: 'nb_manches', label: 'Nb Manches', icone: '🔄' }
         ];
 
         // Étape 4 : Création de la nouvelle ligne de tableau pour accueillir les tuiles
         const nouvelleLigne = document.createElement('tr');
         nouvelleLigne.className = 'row-details-temporaire';
+        // AJOUT NOUVEAU : On lie cette ligne de détails à l'ID de la ligne du joueur
+        nouvelleLigne.setAttribute('data-id-ligne', idUniqueRow);
 
         let htmlTuiles = `
             <td colspan="4" style="padding: 15px; background-color: #111827; border-bottom: 1px solid #334155;">
@@ -141,6 +140,7 @@
         ligneJoueur.insertAdjacentElement('afterend', nouvelleLigne);
         nouvelleLigne.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     };
+
 
     async function chargerClassement() {
         var container = document.getElementById('classement-container');
@@ -191,6 +191,13 @@
                         // Génération de l'affichage pour chaque match (dans le nouvel ordre trié par nb de joueurs)
             codesMatchsTries.forEach(function(codeMatch) {
                 var listeJoueurs = groupes[codeMatch];
+
+
+
+
+
+
+
 
                 // --- APPLICATION DU TRI MULTICRITÈRE ---
                 listeJoueurs.sort(function(a, b) {
@@ -250,6 +257,42 @@
             });
 
 
+
+            // [ ... Votre boucle codesMatchsTries.forEach(function(codeMatch) { ... }) reste identique ici ... ]
+
+            // --- NOUVEAU : Initialisation dynamique du Filtre de Match ---
+            var selectFiltre = document.getElementById('filtre-match');
+            if (selectFiltre) {
+                // On réinitialise les options pour garder uniquement "Tous les matchs"
+                selectFiltre.innerHTML = '<option value="tous">🏆 Tous les matchs</option>';
+                
+                // On ajoute chaque code de match disponible dans le menu déroulant
+                codesMatchsTries.forEach(function(codeMatch) {
+                    var option = document.createElement('option');
+                    option.value = codeMatch;
+                    option.textContent = "Match : " + codeMatch + " (" + groupes[codeMatch].length + " joueurs)";
+                    selectFiltre.appendChild(option);
+                });
+
+                // Écouteur d'événement lors du changement de filtre
+                selectFiltre.addEventListener('change', function() {
+                    var valeurSelectionnee = this.value;
+                    var toutesLesSections = document.querySelectorAll('.match-section');
+
+                    // Fermer une éventuelle tuile de détails ouverte pour éviter les bugs graphiques hors-champ
+                    const detailOuvert = document.querySelector('.row-details-temporaire');
+                    if (detailOuvert) detailOuvert.remove();
+
+                    toutesLesSections.forEach(function(section) {
+                        if (valeurSelectionnee === 'tous' || section.id === 'section-' + valeurSelectionnee) {
+                            section.style.display = 'block'; // Affiche le match sélectionné ou tous
+                        } else {
+                            section.style.display = 'none';  // Masque les autres
+                        }
+                    });
+                });
+            }
+
         } catch (erreur) {
             console.error(erreur);
             container.innerHTML = '<div class="no-data" style="color: #f87171;">Erreur lors du chargement des scores.</div>';
@@ -258,4 +301,27 @@
 
 
 
+
     document.addEventListener('DOMContentLoaded', chargerClassement);
+
+    // --- NOUVEAU : Fermeture automatique lors d'un clic à l'extérieur ---
+    document.addEventListener('click', function(evenement) {
+        // On cherche si une ligne de détails est actuellement affichée
+        const detailOuvert = document.querySelector('.row-details-temporaire');
+        if (!detailOuvert) return; // Rien n'est ouvert, on ne fait rien
+
+        // On récupère l'ID de la ligne du joueur associée à ce détail
+        const idLigneJoueur = detailOuvert.getAttribute('data-id-ligne');
+        const ligneJoueur = document.getElementById(idLigneJoueur);
+
+        // On vérifie si le clic a eu lieu à l'INTÉRIEUR de la boîte de détails
+        const clicDansDetails = detailOuvert.contains(evenement.target);
+        // On vérifie si le clic a eu lieu sur la ligne du joueur (pour éviter de bloquer la fonction d'ouverture/bascule)
+        const clicSurLigneJoueur = ligneJoueur && ligneJoueur.contains(evenement.target);
+
+        // Si le clic n'est ni dans les détails, ni sur la ligne du joueur, on ferme !
+        if (!clicDansDetails && !clicSurLigneJoueur) {
+            detailOuvert.remove();
+        }
+    });
+

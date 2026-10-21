@@ -258,3 +258,44 @@ h1 {
     font-size: 1.2rem;
     color: var(--accent-blue);
 }
+
+
+
+/* --- STYLE DU FILTRE DE MATCH --- */
+.filtre-container {
+    max-width: 400px;
+    margin: 0 auto 25px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 10px;
+}
+
+.filtre-container label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.filtre-container select {
+    background-color: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid var(--card-bg-light);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    width: 100%;
+    appearance: none; /* Supprime le style natif */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+.filtre-container select:focus {
+    border-color: var(--accent-blue);
+}
+

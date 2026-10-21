@@ -8,8 +8,20 @@
     </head>
 <body>
 
+
+
 <div class="container">
     <h1>🏆 Tableau des Classements</h1>
+
+<!-- Filtre de match à placer tout en haut -->
+<div class="filtre-container">
+    <label for="filtre-match">🔍 Filtrer par match :</label>
+    <select id="filtre-match">
+        <option value="tous">🏆 Tous les matchs</option>
+    </select>
+</div>
+
+
     <div id="classement-container">
         <div class="loading">Chargement des scores depuis la base de donnée...</div>
     </div>
